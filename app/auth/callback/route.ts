@@ -1,12 +1,11 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
+import { validateRedirectPath } from '@/lib/utils/validate-redirect-path'
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  const nextParam = searchParams.get('next') ?? '/home'
-  // Prevent open redirect: only allow relative paths (not //evil.com or http://...)
-  const next = nextParam.startsWith('/') && !nextParam.startsWith('//') ? nextParam : '/home'
+  const next = validateRedirectPath(searchParams.get('next'))
 
   if (code) {
     const redirectResponse = NextResponse.redirect(`${origin}${next}`)
