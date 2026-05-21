@@ -1,8 +1,18 @@
 import { LoginHeader } from '@/components/login/login-header'
 import { LoginInteractive } from '@/components/login/login-interactive'
 import { LoginFooter } from '@/components/login/login-footer'
+import { cookies } from 'next/headers'
+import type { Locale } from '@/lib/i18n/login-translations'
 
-export default function LoginPage() {
+async function getInitialLocale(): Promise<Locale> {
+  const cookieStore = await cookies()
+  const locale = cookieStore.get('locale')?.value
+  return locale === 'VN' || locale === 'EN' ? locale : 'VN'
+}
+
+export default async function LoginPage() {
+  const initialLocale = await getInitialLocale()
+
   return (
     <main className="relative min-h-screen w-full bg-[#00101A]">
       {/* Background layers in their own overflow-hidden container so they don't clip dropdowns */}
@@ -32,7 +42,7 @@ export default function LoginPage() {
       <LoginHeader />
 
       {/* B: Hero + auth button — locale-reactive Client Component */}
-      <LoginInteractive />
+      <LoginInteractive initialLocale={initialLocale} />
 
       {/* D: Footer — fixed bottom */}
       <LoginFooter />
