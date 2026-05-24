@@ -1,12 +1,30 @@
-export default function AwardsInformationPage() {
+import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
+import { HomeHeader } from '@/components/home/home-header'
+import { HomeFooter } from '@/components/home/home-footer'
+import { AwardsKeyvisual } from '@/components/awards-information/awards-keyvisual'
+import { AwardsTitleSection } from '@/components/awards-information/awards-title-section'
+import { AwardsSystemSection } from '@/components/awards-information/awards-system-section'
+import { AwardsKudosBanner } from '@/components/awards-information/awards-kudos-banner'
+
+export default async function AwardsInformationPage() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/login')
+  }
+
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#00101A]">
-      <div className="text-center">
-        <h1 className="font-montserrat text-2xl font-semibold text-white">
-          Awards Information
-        </h1>
-        <p className="mt-2 font-montserrat text-white/60">Coming soon</p>
-      </div>
+    <main className="relative min-h-screen w-full bg-[#00101A]">
+      <HomeHeader user={user} />
+      <AwardsKeyvisual />
+      <AwardsTitleSection />
+      <AwardsSystemSection />
+      <AwardsKudosBanner />
+      <HomeFooter />
     </main>
   )
 }
