@@ -8,7 +8,27 @@ export async function GET(request: NextRequest) {
   const next = validateRedirectPath(searchParams.get('next'))
 
   if (code) {
-    const redirectResponse = NextResponse.redirect(`${origin}${next}`)
+    const postAuthRedirectHtml = `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Signing in...</title>
+  </head>
+  <body>
+    <script>
+      window.location.replace(${JSON.stringify(`${origin}${next}`)})
+    </script>
+  </body>
+</html>`
+
+    const successResponse = new NextResponse(postAuthRedirectHtml, {
+      status: 200,
+      headers: {
+        'content-type': 'text/html; charset=utf-8',
+        'cache-control': 'no-store',
+      },
+    })
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -18,7 +38,7 @@ export async function GET(request: NextRequest) {
           getAll: () => request.cookies.getAll(),
           setAll: (cookiesToSet) => {
             cookiesToSet.forEach(({ name, value, options }) =>
-              redirectResponse.cookies.set(name, value, options)
+              successResponse.cookies.set(name, value, options)
             )
           },
         },
@@ -26,7 +46,13 @@ export async function GET(request: NextRequest) {
     )
 
     const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) return redirectResponse
+    if (!error) return successResponse
+
+    console.error('[auth/callback] exchangeCodeForSession failed', {
+      message: error.message,
+      status: error.status,
+      code: error.code,
+    })
   }
 
   return NextResponse.redirect(`${origin}/login?error=auth-failed`)
