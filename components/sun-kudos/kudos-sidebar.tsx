@@ -12,7 +12,7 @@ interface KudosSidebarProps {
 
 export function KudosSidebar({ stats, prizeRecipients, onOpenSecretBox }: KudosSidebarProps) {
   return (
-    <aside className="sticky top-[88px] flex flex-col gap-0" style={{ width: 422 }}>
+    <aside className="sticky top-[88px] flex flex-col gap-4" style={{ width: 422 }}>
       <KudosStatsBlock stats={stats} onOpenSecretBox={onOpenSecretBox} />
       <KudosPrizeList recipients={prizeRecipients} />
     </aside>

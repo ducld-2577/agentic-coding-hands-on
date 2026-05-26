@@ -15,6 +15,7 @@ interface KudosSubmitDialogProps {
   hashtags: KudosHashtag[]
   currentUserId: string
   onSuccess: () => void
+  preselectedReceiver?: { id: string; full_name: string; avatar_url: string | null }
 }
 
 interface SelectedProfile {
@@ -30,15 +31,21 @@ interface ImagePreview {
   url: string | null
 }
 
-export function KudosSubmitDialog({ open, onClose, categories, hashtags, currentUserId, onSuccess }: KudosSubmitDialogProps) {
-  const [receiver, setReceiver] = useState<SelectedProfile | null>(null)
+export function KudosSubmitDialog({ open, onClose, categories, hashtags, currentUserId, onSuccess, preselectedReceiver }: KudosSubmitDialogProps) {
+  const [receiver, setReceiver] = useState<SelectedProfile | null>(preselectedReceiver ?? null)
   const [categoryId, setCategoryId] = useState<number | ''>('')
   const [content, setContent] = useState('')
   const [selectedHashtagIds, setSelectedHashtagIds] = useState<number[]>([])
   const [images, setImages] = useState<ImagePreview[]>([])
+  const [isAnonymous, setIsAnonymous] = useState(false)
+  const [anonymousNickname, setAnonymousNickname] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const firstFocusRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (open && preselectedReceiver) setReceiver(preselectedReceiver)
+  }, [open, preselectedReceiver])
 
   useEffect(() => {
     if (!open) return
@@ -53,7 +60,9 @@ export function KudosSubmitDialog({ open, onClose, categories, hashtags, current
 
   function resetForm() {
     setReceiver(null); setCategoryId(''); setContent('')
-    setSelectedHashtagIds([]); setImages([]); setError(null)
+    setSelectedHashtagIds([]); setImages([])
+    setIsAnonymous(false); setAnonymousNickname('')
+    setError(null)
   }
 
   function handleClose() { resetForm(); onClose() }
@@ -91,11 +100,13 @@ export function KudosSubmitDialog({ open, onClose, categories, hashtags, current
     try {
       const imageUrls = images.map(i => i.url).filter(Boolean) as string[]
       const result = await submitKudos({
-        receiver_id: receiver.id,
-        content: content.trim(),
-        category_id: Number(categoryId),
-        hashtag_ids: selectedHashtagIds,
-        image_urls: imageUrls,
+        receiver_id:        receiver.id,
+        content:            content.trim(),
+        category_id:        Number(categoryId),
+        hashtag_ids:        selectedHashtagIds,
+        image_urls:         imageUrls,
+        is_anonymous:       isAnonymous,
+        anonymous_nickname: isAnonymous ? anonymousNickname : undefined,
       })
       if (result.error) { setError(result.error); return }
       resetForm(); onSuccess(); onClose()
@@ -126,7 +137,7 @@ export function KudosSubmitDialog({ open, onClose, categories, hashtags, current
       >
         <div ref={firstFocusRef} tabIndex={-1} className="sr-only">Dialog start</div>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-bold text-white">Gửi lời cảm ơn</h2>
+          <h2 className="text-lg font-bold text-white">Gửi lời cảm ơn và ghi nhận tới đồng đội</h2>
           <button type="button" onClick={handleClose} aria-label="Đóng" style={{ color: 'rgba(255,255,255,0.5)' }}>
             <X size={20} />
           </button>
@@ -138,6 +149,7 @@ export function KudosSubmitDialog({ open, onClose, categories, hashtags, current
             <KudosReceiverSearch
               currentUserId={currentUserId}
               onSelect={p => setReceiver(p.id ? p : null)}
+              initialReceiver={preselectedReceiver}
             />
           </div>
 
@@ -217,6 +229,35 @@ export function KudosSubmitDialog({ open, onClose, categories, hashtags, current
                 </label>
               )}
             </div>
+          </div>
+
+          {/* Anonymous option */}
+          <div className="flex flex-col gap-2">
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={isAnonymous}
+                onChange={e => setIsAnonymous(e.target.checked)}
+                className="w-4 h-4 accent-[#F5C842] cursor-pointer"
+              />
+              <span className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                Gửi lời cảm ơn và ghi nhận ẩn danh
+              </span>
+            </label>
+
+            {isAnonymous && (
+              <input
+                type="text"
+                value={anonymousNickname}
+                onChange={e => setAnonymousNickname(e.target.value.slice(0, 50))}
+                placeholder="Nickname ẩn danh..."
+                className="rounded-xl px-4 py-2.5 text-sm text-white outline-none"
+                style={{
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                }}
+              />
+            )}
           </div>
 
           {error && <p className="text-sm" style={{ color: '#E84A4A' }}>{error}</p>}

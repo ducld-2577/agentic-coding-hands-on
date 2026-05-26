@@ -1,8 +1,7 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { KudosKvBanner } from './kudos-kv-banner'
-import { KudosSubmitInput } from './kudos-submit-input'
 import { KudosHighlightSection } from './kudos-highlight-section'
 import { KudosSpotlightSection } from './kudos-spotlight-section'
 import { KudosAllKudosSection } from './kudos-all-kudos-section'
@@ -49,11 +48,22 @@ export function KudosLiveBoardClient({
 }: KudosLiveBoardClientProps) {
   const [filters, setFilters] = useState<FilterState>({ hashtag_ids: [], department_id: null })
   const [submitOpen, setSubmitOpen] = useState(false)
+  const [preselectedReceiver, setPreselectedReceiver] = useState<{ id: string; full_name: string; avatar_url: string | null } | null>(null)
   const [secretBoxOpen, setSecretBoxOpen] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
 
   const showToast = useCallback((msg: string) => setToast(msg), [])
   const dismissToast = useCallback(() => setToast(null), [])
+
+  useEffect(() => {
+    function handleOpenSubmit(e: Event) {
+      const detail = (e as CustomEvent<{ id: string; full_name: string; avatar_url: string | null }>).detail
+      setPreselectedReceiver(detail ?? null)
+      setSubmitOpen(true)
+    }
+    window.addEventListener('kudos:open-submit', handleOpenSubmit)
+    return () => window.removeEventListener('kudos:open-submit', handleOpenSubmit)
+  }, [])
 
   function handleHashtagClick(hashtag: string) {
     const match = hashtags.find((h) => h.name === hashtag)
@@ -64,11 +74,7 @@ export function KudosLiveBoardClient({
 
   return (
     <div className="flex flex-col" style={{ background: '#00101A' }}>
-      <KudosKvBanner />
-
-      <div className="px-4 sm:px-8 md:px-[72px] lg:px-[144px] flex justify-center py-6">
-        <KudosSubmitInput onOpen={() => setSubmitOpen(true)} />
-      </div>
+      <KudosKvBanner onOpenKudos={() => setSubmitOpen(true)} />
 
       <KudosHighlightSection
         initialItems={highlightKudos}
@@ -81,9 +87,7 @@ export function KudosLiveBoardClient({
         fetchHighlight={fetchHighlight}
       />
 
-      <div className="px-4 sm:px-8 md:px-[72px] lg:px-[144px] py-10">
-        <KudosSpotlightSection nodes={spotlightNodes} totalKudosCount={totalKudosCount} />
-      </div>
+      <KudosSpotlightSection nodes={spotlightNodes} totalKudosCount={totalKudosCount} recentFeed={feedItems} />
 
       <div className="px-4 sm:px-8 md:px-[72px] lg:px-[144px] py-10">
         <KudosAllKudosSection
@@ -102,12 +106,14 @@ export function KudosLiveBoardClient({
 
       <KudosSubmitDialog
         open={submitOpen}
-        onClose={() => setSubmitOpen(false)}
+        onClose={() => { setSubmitOpen(false); setPreselectedReceiver(null) }}
         categories={categories}
         hashtags={hashtags}
         currentUserId={currentUserId}
+        preselectedReceiver={preselectedReceiver ?? undefined}
         onSuccess={() => {
           setSubmitOpen(false)
+          setPreselectedReceiver(null)
           showToast('Kudos đã được gửi!')
         }}
       />

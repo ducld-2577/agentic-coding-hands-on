@@ -34,6 +34,7 @@ export function LoginHeroSection({
               src="/login/Root_Further_Logo.png"
               alt={tagline}
               fill
+              sizes="(max-width: 640px) 100vw, (max-width: 768px) 451px, 451px"
               className="object-contain object-left"
               priority
             />

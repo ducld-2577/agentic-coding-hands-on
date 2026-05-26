@@ -121,9 +121,49 @@ export function KudosHighlightCarousel({
         </button>
       </div>
 
-      <p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>
-        {currentIndex + 1}/{items.length}
-      </p>
+      <div className="flex items-center gap-4">
+        <button
+          type="button"
+          aria-label="Previous"
+          disabled={!hasPrev}
+          onClick={() => setCurrentIndex((i) => i - 1)}
+          className="flex items-center justify-center rounded-full transition-opacity"
+          style={{
+            width: '36px',
+            height: '36px',
+            background: 'rgba(255,255,255,0.1)',
+            border: '1px solid rgba(255,255,255,0.2)',
+            color: 'white',
+            opacity: hasPrev ? 1 : 0.3,
+            cursor: hasPrev ? 'pointer' : 'default',
+          }}
+        >
+          <ChevronLeft size={18} aria-hidden="true" />
+        </button>
+
+        <span className="text-sm font-semibold tabular-nums" style={{ color: 'rgba(255,255,255,0.7)', minWidth: '40px', textAlign: 'center' }}>
+          {currentIndex + 1}/{items.length}
+        </span>
+
+        <button
+          type="button"
+          aria-label="Next"
+          disabled={!hasNext}
+          onClick={() => setCurrentIndex((i) => i + 1)}
+          className="flex items-center justify-center rounded-full transition-opacity"
+          style={{
+            width: '36px',
+            height: '36px',
+            background: 'rgba(255,255,255,0.1)',
+            border: '1px solid rgba(255,255,255,0.2)',
+            color: 'white',
+            opacity: hasNext ? 1 : 0.3,
+            cursor: hasNext ? 'pointer' : 'default',
+          }}
+        >
+          <ChevronRight size={18} aria-hidden="true" />
+        </button>
+      </div>
     </div>
   )
 }

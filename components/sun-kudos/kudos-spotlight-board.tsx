@@ -3,12 +3,22 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import * as d3 from 'd3'
-import type { SpotlightNode } from '@/lib/kudos/types'
+import type { SpotlightNode, KudosFeedItem } from '@/lib/kudos/types'
 import { KudosSpotlightTooltip } from './kudos-spotlight-tooltip'
 
 interface KudosSpotlightBoardProps {
   nodes: SpotlightNode[]
   totalKudosCount: number
+  recentFeed?: KudosFeedItem[]
+}
+
+function formatTickerTime(iso: string): string {
+  const d = new Date(iso)
+  const hh = d.getHours()
+  const mm = String(d.getMinutes()).padStart(2, '0')
+  const ampm = hh >= 12 ? 'PM' : 'AM'
+  const h12 = hh % 12 || 12
+  return `${String(h12).padStart(2, '0')}:${mm}${ampm}`
 }
 
 interface TooltipState {
@@ -19,7 +29,7 @@ interface TooltipState {
 
 interface SimNode extends SpotlightNode, d3.SimulationNodeDatum {}
 
-export function KudosSpotlightBoard({ nodes, totalKudosCount }: KudosSpotlightBoardProps) {
+export function KudosSpotlightBoard({ nodes, totalKudosCount, recentFeed }: KudosSpotlightBoardProps) {
   const svgRef = useRef<SVGSVGElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const simulationRef = useRef<d3.Simulation<SimNode, undefined> | null>(null)
@@ -182,8 +192,20 @@ export function KudosSpotlightBoard({ nodes, totalKudosCount }: KudosSpotlightBo
     svg.selectAll<SVGTextElement, SimNode>('text').attr('opacity', (d) => getNodeOpacity(d, maxCount))
   }, [debouncedQuery, nodes, getNodeOpacity])
 
+  const tickerItems = (recentFeed ?? []).slice(0, 8)
+
   return (
-    <div ref={containerRef} className="relative w-full" style={{ height: '548px', backgroundColor: '#051825' }}>
+    <div
+      ref={containerRef}
+      className="relative w-full"
+      style={{
+        height: '548px',
+        backgroundColor: '#051825',
+        borderRadius: '16px',
+        border: '1px solid rgba(255,255,255,0.12)',
+        overflow: 'hidden',
+      }}
+    >
       {/* Top bar */}
       <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-6 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.12)' }}>
         <div className="flex items-center gap-2 bg-[#0a2233] rounded-md px-3 py-1.5" style={{ border: '1px solid rgba(255,255,255,0.12)' }}>
@@ -250,6 +272,34 @@ export function KudosSpotlightBoard({ nodes, totalKudosCount }: KudosSpotlightBo
       {nodes.length === 0 && (
         <div className="absolute inset-0 flex items-center justify-center z-20">
           <p className="text-white/50 text-base">Chưa có dữ liệu</p>
+        </div>
+      )}
+
+      {/* Live feed ticker at bottom-left */}
+      {tickerItems.length > 0 && (
+        <div
+          className="absolute bottom-0 left-0 z-10 flex flex-col-reverse gap-1 px-4 py-3"
+          style={{
+            background: 'linear-gradient(to top, rgba(5,24,37,0.95) 60%, transparent)',
+            width: '55%',
+            maxHeight: '180px',
+            overflow: 'hidden',
+            pointerEvents: 'none',
+          }}
+        >
+          {tickerItems.map((item) => (
+            <p
+              key={item.id}
+              className="text-xs truncate"
+              style={{ color: 'rgba(255,255,255,0.65)', lineHeight: '20px' }}
+            >
+              <span style={{ color: 'rgba(255,255,255,0.4)', marginRight: '6px' }}>
+                {formatTickerTime(item.created_at)}
+              </span>
+              <span style={{ fontWeight: 600 }}>{item.receiver.full_name}</span>
+              {' đã nhận được một Kudos mới'}
+            </p>
+          ))}
         </div>
       )}
 

@@ -73,18 +73,19 @@ export function KudosPhongbanDropdown({
                 color: isSelected ? '#F5C842' : 'rgba(255,255,255,0.85)',
                 fontSize: '14px',
                 lineHeight: '20px',
-                borderLeft: isSelected ? '3px solid #F5C842' : '3px solid transparent',
-                paddingLeft: isSelected ? '13px' : '13px',
-                paddingRight: '16px',
-                paddingTop: '8px',
-                paddingBottom: '8px',
+                background: isSelected ? 'rgba(245,200,66,0.1)' : 'transparent',
+                padding: '8px 16px',
                 transition: 'background 0.15s',
               }}
               onMouseEnter={(e) => {
-                ;(e.currentTarget as HTMLLIElement).style.background = 'rgba(255,255,255,0.06)'
+                if (!isSelected) {
+                  ;(e.currentTarget as HTMLLIElement).style.background = 'rgba(255,255,255,0.06)'
+                }
               }}
               onMouseLeave={(e) => {
-                ;(e.currentTarget as HTMLLIElement).style.background = 'transparent'
+                ;(e.currentTarget as HTMLLIElement).style.background = isSelected
+                  ? 'rgba(245,200,66,0.1)'
+                  : 'transparent'
               }}
             >
               {dept.name}

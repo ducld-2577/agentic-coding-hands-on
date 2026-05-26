@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { KudosUserInfoBlock } from './kudos-user-info-block'
 import { KudosImageGallery } from './kudos-image-gallery'
@@ -23,16 +22,27 @@ export interface KudosPostCardProps {
   currentUserId: string
   onHashtagClick: (hashtag: string) => void
   onCopySuccess: () => void
+  onOpenDetail: () => void
 }
 
-export function KudosPostCard({ item, currentUserId, onHashtagClick, onCopySuccess }: KudosPostCardProps) {
+export function KudosPostCard({ item, currentUserId, onHashtagClick, onCopySuccess, onOpenDetail }: KudosPostCardProps) {
+  // When anonymous, show nickname instead of real sender info and disable hover card
+  const displaySender = item.is_anonymous
+    ? {
+        ...item.sender,
+        full_name:   item.anonymous_nickname ?? 'Ẩn danh',
+        avatar_url:  null,
+        badge_title: null,
+      }
+    : item.sender
+
   return (
     <div
-      className="flex flex-col gap-3 w-full max-w-[680px]"
+      className="flex flex-col gap-3 w-full"
       style={{ background: '#F5F0E4', borderRadius: 16, padding: 24 }}
     >
       <div className="flex items-center gap-3">
-        <KudosUserInfoBlock user={item.sender} size={48} />
+        <KudosUserInfoBlock user={displaySender} size={48} disableHover={item.is_anonymous} />
         <ArrowRight size={18} style={{ color: 'rgba(0,0,0,0.35)', flexShrink: 0 }} />
         <KudosUserInfoBlock user={item.receiver} size={48} />
       </div>
@@ -47,13 +57,14 @@ export function KudosPostCard({ item, currentUserId, onHashtagClick, onCopySucce
         </span>
       )}
 
-      <Link
-        href={`/sun-kudos/${item.id}`}
-        className="text-sm leading-relaxed line-clamp-5 hover:opacity-80 transition-opacity"
+      <button
+        type="button"
+        onClick={onOpenDetail}
+        className="text-sm leading-relaxed line-clamp-5 text-left w-full bg-transparent border-none p-0 cursor-pointer hover:opacity-75 transition-opacity"
         style={{ color: '#1A1A1A' }}
       >
         {item.content}
-      </Link>
+      </button>
 
       {item.image_urls.length > 0 && (
         <KudosImageGallery urls={item.image_urls} />

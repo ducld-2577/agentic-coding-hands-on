@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { KudosPostCard } from './kudos-post-card'
+import { KudosDetailDialog } from './kudos-detail-dialog'
 import type { KudosFeedItem, FilterState, FeedPage } from '@/lib/kudos/types'
 
 interface KudosFeedProps {
@@ -27,10 +28,10 @@ export function KudosFeed({
   const [cursor, setCursor] = useState<string | null>(initialCursor)
   const [loading, setLoading] = useState(false)
   const [hasMore, setHasMore] = useState(initialCursor !== null)
+  const [detailItem, setDetailItem] = useState<KudosFeedItem | null>(null)
   const sentinelRef = useRef<HTMLDivElement>(null)
   const filtersRef = useRef(filters)
 
-  // Update filter ref when filters change
   useEffect(() => {
     filtersRef.current = filters
   }, [filters])
@@ -73,27 +74,40 @@ export function KudosFeed({
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      {items.map((item) => (
-        <KudosPostCard
-          key={item.id}
-          item={item}
+    <>
+      <div className="flex flex-col gap-4">
+        {items.map((item) => (
+          <KudosPostCard
+            key={item.id}
+            item={item}
+            currentUserId={currentUserId}
+            onHashtagClick={onHashtagClick}
+            onCopySuccess={onCopySuccess}
+            onOpenDetail={() => setDetailItem(item)}
+          />
+        ))}
+
+        <div ref={sentinelRef} className="h-4" aria-hidden="true" />
+
+        {loading && (
+          <div className="flex justify-center py-6">
+            <span
+              className="inline-block w-6 h-6 rounded-full border-2 border-t-transparent animate-spin"
+              style={{ borderColor: '#F5C842', borderTopColor: 'transparent' }}
+            />
+          </div>
+        )}
+      </div>
+
+      {detailItem && (
+        <KudosDetailDialog
+          item={detailItem}
           currentUserId={currentUserId}
+          onClose={() => setDetailItem(null)}
           onHashtagClick={onHashtagClick}
           onCopySuccess={onCopySuccess}
         />
-      ))}
-
-      <div ref={sentinelRef} className="h-4" aria-hidden="true" />
-
-      {loading && (
-        <div className="flex justify-center py-6">
-          <span
-            className="inline-block w-6 h-6 rounded-full border-2 border-t-transparent animate-spin"
-            style={{ borderColor: '#F5C842', borderTopColor: 'transparent' }}
-          />
-        </div>
       )}
-    </div>
+    </>
   )
 }

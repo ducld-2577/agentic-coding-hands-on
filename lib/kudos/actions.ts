@@ -85,6 +85,8 @@ export async function submitKudos(data: {
   category_id: number | null
   hashtag_ids: number[]
   image_urls: string[]
+  is_anonymous?: boolean
+  anonymous_nickname?: string
 }): Promise<{ kudos_id?: string; error?: string }> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -107,11 +109,13 @@ export async function submitKudos(data: {
   const { data: kudos, error: kudosError } = await supabase
     .from('kudos')
     .insert({
-      sender_id:   user.id,
-      receiver_id: data.receiver_id,
-      content:     trimmedContent,
-      category_id: data.category_id,
-      image_urls:  data.image_urls,
+      sender_id:          user.id,
+      receiver_id:        data.receiver_id,
+      content:            trimmedContent,
+      category_id:        data.category_id,
+      image_urls:         data.image_urls,
+      is_anonymous:       data.is_anonymous ?? false,
+      anonymous_nickname: data.is_anonymous ? (data.anonymous_nickname?.trim() || null) : null,
     })
     .select('id')
     .single()

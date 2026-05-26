@@ -63,58 +63,38 @@ export function KudosHashtagDropdown({
         + Hashtag · Tối đa 5
       </div>
 
-      <ul className="py-1">
+      <div className="flex flex-wrap gap-2 p-4">
         {hashtags.map((tag) => {
           const isSelected = selected.includes(tag.id)
           const isDisabled = !isSelected && selected.length >= 5
 
           return (
-            <li
+            <button
               key={tag.id}
+              type="button"
               role="option"
               aria-selected={isSelected}
               onClick={() => !isDisabled && toggle(tag.id)}
-              className="flex items-center justify-between px-4 py-2 cursor-pointer font-montserrat"
+              className="font-montserrat font-medium cursor-pointer select-none"
               style={{
-                color: isSelected ? '#F5C842' : 'rgba(255,255,255,0.85)',
-                fontSize: '14px',
-                lineHeight: '20px',
-                opacity: isDisabled ? 0.4 : 1,
+                height: '32px',
+                padding: '0 12px',
+                borderRadius: '20px',
+                border: isSelected ? '1px solid #F5C842' : '1px solid rgba(255,255,255,0.2)',
+                background: isSelected ? 'rgba(245,200,66,0.15)' : 'rgba(255,255,255,0.06)',
+                color: isSelected ? '#F5C842' : 'rgba(255,255,255,0.75)',
+                fontSize: '13px',
+                opacity: isDisabled ? 0.35 : 1,
                 pointerEvents: isDisabled ? 'none' : 'auto',
-                transition: 'background 0.15s',
-              }}
-              onMouseEnter={(e) => {
-                if (!isDisabled) {
-                  ;(e.currentTarget as HTMLLIElement).style.background =
-                    'rgba(255,255,255,0.06)'
-                }
-              }}
-              onMouseLeave={(e) => {
-                ;(e.currentTarget as HTMLLIElement).style.background = 'transparent'
+                transition: 'border 0.15s, background 0.15s, color 0.15s',
+                whiteSpace: 'nowrap',
               }}
             >
-              <span>#{tag.name}</span>
-              {isSelected && (
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M3 8L6.5 11.5L13 5"
-                    stroke="#F5C842"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              )}
-            </li>
+              #{tag.name}
+            </button>
           )
         })}
-      </ul>
+      </div>
     </div>
   )
 }

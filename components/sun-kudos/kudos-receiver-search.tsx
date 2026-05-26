@@ -15,12 +15,13 @@ interface ProfileResult {
 interface KudosReceiverSearchProps {
   onSelect: (profile: { id: string; full_name: string; avatar_url: string | null }) => void
   currentUserId: string
+  initialReceiver?: { id: string; full_name: string; avatar_url: string | null }
 }
 
-export function KudosReceiverSearch({ onSelect, currentUserId }: KudosReceiverSearchProps) {
+export function KudosReceiverSearch({ onSelect, currentUserId, initialReceiver }: KudosReceiverSearchProps) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<ProfileResult[]>([])
-  const [selected, setSelected] = useState<{ id: string; full_name: string; avatar_url: string | null } | null>(null)
+  const [selected, setSelected] = useState<{ id: string; full_name: string; avatar_url: string | null } | null>(initialReceiver ?? null)
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)

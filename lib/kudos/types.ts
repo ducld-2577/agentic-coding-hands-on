@@ -15,7 +15,7 @@ export interface KudosCategory {
   name: string
 }
 
-export type BadgeTitle = 'New Hero' | 'Rising Hero' | 'Legend Hero'
+export type BadgeTitle = 'New Hero' | 'Rising Hero' | 'Super Hero' | 'Legend Hero'
 export type StarLevel = 0 | 1 | 2 | 3
 
 export interface Profile {
@@ -39,6 +39,8 @@ export interface ProfileSummary {
   department_name: string | null
   badge_title: BadgeTitle | null
   star_level: StarLevel
+  kudos_received_count: number
+  kudos_sent_count: number
 }
 
 export interface KudosFeedItem {
@@ -52,6 +54,8 @@ export interface KudosFeedItem {
   like_count: number
   user_liked: boolean
   created_at: string
+  is_anonymous: boolean
+  anonymous_nickname: string | null
 }
 
 export interface KudosStats {

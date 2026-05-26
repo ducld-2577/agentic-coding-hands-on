@@ -48,11 +48,11 @@ export function KudosHighlightSection({
       className="w-full py-10"
       style={{ background: '#00101A' }}
     >
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-8 md:px-[72px] lg:px-[144px]">
+      <div className="px-4 sm:px-8 md:px-[72px] lg:px-[144px]">
         <div className="flex flex-col gap-2 mb-6">
           <div className="flex items-center gap-3">
             <span
-              className="text-xs font-medium uppercase tracking-widest"
+              className="text-xs font-medium tracking-wide"
               style={{ color: 'rgba(255,255,255,0.5)' }}
             >
               Sun* Annual Awards 2025
@@ -66,7 +66,7 @@ export function KudosHighlightSection({
           <div className="flex items-center justify-between gap-4">
             <h2
               className="font-black uppercase leading-none"
-              style={{ color: '#FFFFFF', fontSize: '64px', letterSpacing: '-1px' }}
+              style={{ color: '#F5C842', fontSize: '64px', letterSpacing: '-1px' }}
             >
               HIGHLIGHT KUDOS
             </h2>

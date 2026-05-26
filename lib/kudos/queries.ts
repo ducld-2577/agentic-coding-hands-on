@@ -53,28 +53,34 @@ function shapeKudosRow(row: any): KudosFeedItem {
   return {
     id: row.id,
     sender: {
-      id:              row.sender_id,
-      full_name:       row.sender_name,
-      avatar_url:      row.sender_avatar,
-      department_name: row.sender_dept,
-      badge_title:     row.sender_badge ?? null,
-      star_level:      row.sender_stars ?? 0,
+      id:                   row.sender_id,
+      full_name:            row.sender_name,
+      avatar_url:           row.sender_avatar,
+      department_name:      row.sender_dept,
+      badge_title:          row.sender_badge ?? null,
+      star_level:           row.sender_stars ?? 0,
+      kudos_received_count: row.sender_received ?? 0,
+      kudos_sent_count:     row.sender_sent ?? 0,
     },
     receiver: {
-      id:              row.receiver_id,
-      full_name:       row.receiver_name,
-      avatar_url:      row.receiver_avatar,
-      department_name: row.receiver_dept,
-      badge_title:     row.receiver_badge ?? null,
-      star_level:      row.receiver_stars ?? 0,
+      id:                   row.receiver_id,
+      full_name:            row.receiver_name,
+      avatar_url:           row.receiver_avatar,
+      department_name:      row.receiver_dept,
+      badge_title:          row.receiver_badge ?? null,
+      star_level:           row.receiver_stars ?? 0,
+      kudos_received_count: row.receiver_received ?? 0,
+      kudos_sent_count:     row.receiver_sent ?? 0,
     },
-    content:       row.content,
-    category_name: row.category_name ?? null,
-    image_urls:    row.image_urls ?? [],
-    hashtags:      row.hashtag_names?.filter(Boolean) ?? [],
-    like_count:    row.like_count ?? 0,
-    user_liked:    row.user_liked ?? false,
-    created_at:    row.created_at,
+    content:            row.content,
+    category_name:      row.category_name ?? null,
+    image_urls:         row.image_urls ?? [],
+    hashtags:           row.hashtag_names?.filter(Boolean) ?? [],
+    like_count:         row.like_count ?? 0,
+    user_liked:         row.user_liked ?? false,
+    created_at:         row.created_at,
+    is_anonymous:       row.is_anonymous ?? false,
+    anonymous_nickname: row.anonymous_nickname ?? null,
   }
 }
 
@@ -135,14 +141,17 @@ async function getKudosFeedDirect(
     .from('kudos')
     .select(`
       id, content, image_urls, like_count, created_at,
+      is_anonymous, anonymous_nickname,
       category_id,
       kudos_categories!left(name),
       sender:profiles!kudos_sender_id_fkey(
         id, full_name, avatar_url, badge_title, star_level,
+        kudos_received_count, kudos_sent_count,
         departments!left(name)
       ),
       receiver:profiles!kudos_receiver_id_fkey(
         id, full_name, avatar_url, badge_title, star_level,
+        kudos_received_count, kudos_sent_count,
         departments!left(name)
       ),
       kudos_to_hashtags(kudos_hashtags(name)),
@@ -172,20 +181,24 @@ async function getKudosFeedDirect(
   const items = (data ?? []).slice(0, FEED_PAGE_SIZE).map((row: any) => ({
     id:            row.id,
     sender: {
-      id:              row.sender.id,
-      full_name:       row.sender.full_name,
-      avatar_url:      row.sender.avatar_url,
-      department_name: row.sender.departments?.name ?? null,
-      badge_title:     row.sender.badge_title ?? null,
-      star_level:      row.sender.star_level ?? 0,
+      id:                   row.sender.id,
+      full_name:            row.sender.full_name,
+      avatar_url:           row.sender.avatar_url,
+      department_name:      row.sender.departments?.name ?? null,
+      badge_title:          row.sender.badge_title ?? null,
+      star_level:           row.sender.star_level ?? 0,
+      kudos_received_count: row.sender.kudos_received_count ?? 0,
+      kudos_sent_count:     row.sender.kudos_sent_count ?? 0,
     },
     receiver: {
-      id:              row.receiver.id,
-      full_name:       row.receiver.full_name,
-      avatar_url:      row.receiver.avatar_url,
-      department_name: row.receiver.departments?.name ?? null,
-      badge_title:     row.receiver.badge_title ?? null,
-      star_level:      row.receiver.star_level ?? 0,
+      id:                   row.receiver.id,
+      full_name:            row.receiver.full_name,
+      avatar_url:           row.receiver.avatar_url,
+      department_name:      row.receiver.departments?.name ?? null,
+      badge_title:          row.receiver.badge_title ?? null,
+      star_level:           row.receiver.star_level ?? 0,
+      kudos_received_count: row.receiver.kudos_received_count ?? 0,
+      kudos_sent_count:     row.receiver.kudos_sent_count ?? 0,
     },
     content:       row.content,
     category_name: row.kudos_categories?.name ?? null,
@@ -193,9 +206,11 @@ async function getKudosFeedDirect(
     hashtags:      row.kudos_to_hashtags
       ?.map((kth: { kudos_hashtags: { name: string } | null }) => kth.kudos_hashtags?.name)
       .filter(Boolean) ?? [],
-    like_count:    row.like_count ?? 0,
-    user_liked:    row.kudos_likes?.some((l: { user_id: string }) => l.user_id === currentUserId) ?? false,
-    created_at:    row.created_at,
+    like_count:         row.like_count ?? 0,
+    user_liked:         row.kudos_likes?.some((l: { user_id: string }) => l.user_id === currentUserId) ?? false,
+    created_at:         row.created_at,
+    is_anonymous:       row.is_anonymous ?? false,
+    anonymous_nickname: row.anonymous_nickname ?? null,
   }))
 
   const nextCursor = data && data.length > FEED_PAGE_SIZE
@@ -230,13 +245,16 @@ export async function getHighlightKudos(
     .from('kudos')
     .select(`
       id, content, image_urls, like_count, created_at,
+      is_anonymous, anonymous_nickname,
       kudos_categories!left(name),
       sender:profiles!kudos_sender_id_fkey(
         id, full_name, avatar_url, badge_title, star_level,
+        kudos_received_count, kudos_sent_count,
         departments!left(name)
       ),
       receiver:profiles!kudos_receiver_id_fkey(
         id, full_name, avatar_url, badge_title, star_level,
+        kudos_received_count, kudos_sent_count,
         departments!left(name)
       ),
       kudos_to_hashtags(kudos_hashtags(name)),
@@ -264,20 +282,24 @@ export async function getHighlightKudos(
   return (data ?? []).map((row: any) => ({
     id:            row.id,
     sender: {
-      id:              row.sender.id,
-      full_name:       row.sender.full_name,
-      avatar_url:      row.sender.avatar_url,
-      department_name: row.sender.departments?.name ?? null,
-      badge_title:     row.sender.badge_title ?? null,
-      star_level:      row.sender.star_level ?? 0,
+      id:                   row.sender.id,
+      full_name:            row.sender.full_name,
+      avatar_url:           row.sender.avatar_url,
+      department_name:      row.sender.departments?.name ?? null,
+      badge_title:          row.sender.badge_title ?? null,
+      star_level:           row.sender.star_level ?? 0,
+      kudos_received_count: row.sender.kudos_received_count ?? 0,
+      kudos_sent_count:     row.sender.kudos_sent_count ?? 0,
     },
     receiver: {
-      id:              row.receiver.id,
-      full_name:       row.receiver.full_name,
-      avatar_url:      row.receiver.avatar_url,
-      department_name: row.receiver.departments?.name ?? null,
-      badge_title:     row.receiver.badge_title ?? null,
-      star_level:      row.receiver.star_level ?? 0,
+      id:                   row.receiver.id,
+      full_name:            row.receiver.full_name,
+      avatar_url:           row.receiver.avatar_url,
+      department_name:      row.receiver.departments?.name ?? null,
+      badge_title:          row.receiver.badge_title ?? null,
+      star_level:           row.receiver.star_level ?? 0,
+      kudos_received_count: row.receiver.kudos_received_count ?? 0,
+      kudos_sent_count:     row.receiver.kudos_sent_count ?? 0,
     },
     content:       row.content,
     category_name: row.kudos_categories?.name ?? null,
@@ -285,9 +307,11 @@ export async function getHighlightKudos(
     hashtags:      row.kudos_to_hashtags
       ?.map((kth: { kudos_hashtags: { name: string } | null }) => kth.kudos_hashtags?.name)
       .filter(Boolean) ?? [],
-    like_count:    row.like_count ?? 0,
-    user_liked:    row.kudos_likes?.some((l: { user_id: string }) => l.user_id === currentUserId) ?? false,
-    created_at:    row.created_at,
+    like_count:         row.like_count ?? 0,
+    user_liked:         row.kudos_likes?.some((l: { user_id: string }) => l.user_id === currentUserId) ?? false,
+    created_at:         row.created_at,
+    is_anonymous:       row.is_anonymous ?? false,
+    anonymous_nickname: row.anonymous_nickname ?? null,
   }))
 }
 
@@ -303,7 +327,7 @@ export async function getKudosStats(userId: string): Promise<KudosStats> {
       .from('profiles')
       .select('kudos_received_count, kudos_sent_count, hearts_received')
       .eq('id', userId)
-      .single(),
+      .maybeSingle(),
     supabase
       .from('secret_boxes')
       .select('is_opened')
@@ -316,10 +340,10 @@ export async function getKudosStats(userId: string): Promise<KudosStats> {
   const boxes = boxRes.data ?? []
 
   return {
-    received:      profile.kudos_received_count,
-    sent:          profile.kudos_sent_count,
-    hearts:        profile.hearts_received,
-    opened_boxes:  boxes.filter(b => b.is_opened).length,
+    received:       profile?.kudos_received_count ?? 0,
+    sent:           profile?.kudos_sent_count ?? 0,
+    hearts:         profile?.hearts_received ?? 0,
+    opened_boxes:   boxes.filter(b => b.is_opened).length,
     unopened_boxes: boxes.filter(b => !b.is_opened).length,
   }
 }

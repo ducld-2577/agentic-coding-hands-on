@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import type { KudosStats } from '@/lib/kudos/types'
 
 interface KudosStatsBlockProps {
@@ -38,12 +39,7 @@ export function KudosStatsBlock({ stats, onOpenSecretBox }: KudosStatsBlockProps
           <span className="text-sm font-bold" style={{ color: '#F5C842' }}>
             {stats.hearts}
           </span>
-          <span
-            className="text-xs font-bold px-1.5 py-0.5 rounded"
-            style={{ background: 'rgba(245,200,66,0.15)', color: '#F5C842' }}
-          >
-            ×2
-          </span>
+          <Image src="/kudos/x2.png" alt="×2" width={32} height={20} className="object-contain" />
         </div>
       </div>
 
@@ -58,7 +54,7 @@ export function KudosStatsBlock({ stats, onOpenSecretBox }: KudosStatsBlockProps
         className="w-full mt-1 py-2.5 text-sm font-bold rounded-full transition-opacity hover:opacity-90"
         style={{ background: '#F5C842', color: '#1A1A1A' }}
       >
-        Mở quà
+        Mở Secret Box 🎁
       </button>
     </div>
   )
