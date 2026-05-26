@@ -1,36 +1,185 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SAA 2025 — Sun Asterisk Awards Platform
 
-## Getting Started
+Nền tảng trao giải nội bộ Sun Asterisk 2025, bao gồm trang giới thiệu giải thưởng, hệ thống Sun\* Kudos Live Board và xác thực người dùng.
 
-First, run the development server:
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 16 (App Router) |
+| Language | TypeScript 5 (strict mode) |
+| Styling | Tailwind CSS v4 |
+| Database / Auth | Supabase (PostgreSQL + Supabase Auth) |
+| Visualization | D3 v7 |
+| Testing | Vitest |
+
+## Prerequisites
+
+Cài đặt các công cụ sau trước khi bắt đầu:
+
+- **Node.js** ≥ 20 — [nodejs.org](https://nodejs.org)
+- **Docker Desktop** (bắt buộc để chạy Supabase local) — [docker.com](https://www.docker.com/products/docker-desktop)
+- **Supabase CLI** — cài qua npm hoặc brew:
+  ```bash
+  npm install -g supabase
+  # hoặc
+  brew install supabase/tap/supabase
+  ```
+
+## Quick Start
+
+### 1. Clone & cài đặt dependencies
+
+```bash
+git clone <repo-url>
+cd saa-project-demo-momorph
+npm install
+```
+
+### 2. Khởi động Supabase local
+
+Đảm bảo Docker Desktop đang chạy, sau đó:
+
+```bash
+npx supabase start
+```
+
+Lệnh này sẽ khởi động toàn bộ Supabase stack (PostgreSQL, Auth, Storage, ...) trên local. Kết thúc sẽ in ra thông tin:
+
+```
+API URL: http://127.0.0.1:54321
+DB URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+anon key: eyJhbGci...   ← copy giá trị này
+```
+
+### 3. Cấu hình biến môi trường
+
+```bash
+cp .env.local.template .env.local
+```
+
+Mở `.env.local` và điền `anon key` vừa lấy được:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon key từ bước trên>
+
+# Google OAuth — xem hướng dẫn bên dưới nếu cần
+SUPABASE_AUTH_GOOGLE_CLIENT_ID=
+SUPABASE_AUTH_GOOGLE_SECRET=
+```
+
+### 4. Apply database migrations & seed data
+
+```bash
+npx supabase db reset
+```
+
+Lệnh này tự động chạy toàn bộ migration trong `supabase/migrations/` và load seed data.
+
+### 5. Chạy development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Mở [http://localhost:3000](http://localhost:3000) trên trình duyệt.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Cấu trúc project
 
-## Learn More
+```
+├── app/                     # Next.js App Router pages
+│   ├── login/               # Trang đăng nhập (public)
+│   ├── home/                # Trang chủ (protected)
+│   ├── sun-kudos/           # Sun* Kudos Live Board (protected)
+│   ├── awards-information/  # Thông tin giải thưởng (protected)
+│   ├── profile/             # Trang cá nhân (protected)
+│   └── admin/               # Trang admin (protected)
+├── components/              # React components theo từng feature
+│   ├── login/
+│   ├── sun-kudos/
+│   └── ...
+├── lib/                     # Business logic, queries, actions
+│   └── kudos/               # Supabase queries & server actions
+├── hooks/                   # Custom React hooks
+├── supabase/
+│   ├── config.toml          # Cấu hình Supabase local
+│   └── migrations/          # SQL migration files
+├── public/                  # Static assets
+└── __tests__/               # Vitest test files
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Các trang chính
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| URL | Mô tả | Yêu cầu auth |
+|---|---|---|
+| `/login` | Đăng nhập (email/password, Google OAuth) | Không |
+| `/home` | Trang chủ, countdown, danh mục giải thưởng | Có |
+| `/sun-kudos` | Kudos Live Board (D3 graph, realtime feed) | Có |
+| `/awards-information` | Thông tin chi tiết các hạng mục giải | Có |
+| `/profile` | Trang cá nhân | Có |
+| `/admin` | Quản trị | Có |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Scripts
 
-## Deploy on Vercel
+```bash
+npm run dev        # Chạy development server (localhost:3000)
+npm run build      # Build production
+npm run start      # Chạy production build
+npm run lint       # Kiểm tra linting
+npm run test       # Chạy test suite (Vitest)
+npm run test:watch # Chạy test ở watch mode
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Cấu hình Google OAuth (tuỳ chọn)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Nếu muốn đăng nhập bằng Google:
+
+1. Tạo project trên [Google Cloud Console](https://console.cloud.google.com/)
+2. Vào **APIs & Services → Credentials → Create OAuth 2.0 Client ID**
+3. Thêm **Authorized redirect URI**: `http://127.0.0.1:54321/auth/v1/callback`
+4. Copy **Client ID** và **Client Secret** vào `.env.local`:
+   ```env
+   SUPABASE_AUTH_GOOGLE_CLIENT_ID=<your-client-id>
+   SUPABASE_AUTH_GOOGLE_SECRET=<your-client-secret>
+   ```
+5. Restart Supabase: `npx supabase stop && npx supabase start`
+
+## Quản lý database (Supabase)
+
+```bash
+# Xem trạng thái các service
+npx supabase status
+
+# Dừng Supabase
+npx supabase stop
+
+# Reset DB về trạng thái ban đầu (chạy lại toàn bộ migration + seed)
+npx supabase db reset
+
+# Mở Supabase Studio (UI quản lý DB)
+# Sau khi supabase start, truy cập: http://127.0.0.1:54323
+```
+
+## Xử lý lỗi thường gặp
+
+**`supabase start` bị treo / lỗi Docker**
+→ Đảm bảo Docker Desktop đang chạy và có ít nhất 4GB RAM được cấp cho Docker.
+
+**Lỗi `NEXT_PUBLIC_SUPABASE_ANON_KEY` chưa được set**
+→ Chạy `npx supabase status` để lấy lại `anon key`, sau đó cập nhật `.env.local`.
+
+**Lỗi authentication callback**
+→ Kiểm tra `additional_redirect_urls` trong `supabase/config.toml`, đảm bảo `http://localhost:3000/auth/callback` có trong danh sách.
+
+**Port conflict (54321, 54322, 54323)**
+→ Dừng Supabase bằng `npx supabase stop`, kiểm tra process đang chiếm port, sau đó start lại.
+
+## Đóng góp
+
+1. Tạo branch từ `main` theo quy ước: `feature/<slug>`, `fix/<slug>`
+2. Commit theo [Conventional Commits](https://www.conventionalcommits.org/): `feat:`, `fix:`, `docs:`, `refactor:`, `test:`
+3. Chạy `npm run lint` và `npm run test` trước khi tạo PR
+4. Không commit file `.env.local` hoặc thông tin nhạy cảm
