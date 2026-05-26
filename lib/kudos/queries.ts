@@ -6,6 +6,7 @@ import type {
   Department, KudosHashtag, KudosCategory,
   KudosFeedItem, KudosStats, SpotlightNode,
   PrizeRecipient, SecretBox, FeedPage, FilterState,
+  Profile, ProfileFeedFilter,
 } from './types'
 
 const FEED_PAGE_SIZE = 10
@@ -436,4 +437,120 @@ export async function getUserSecretBoxes(userId: string): Promise<SecretBox[]> {
     .order('created_at', { ascending: false })
   if (error) throw error
   return data ?? []
+}
+
+// ─────────────────────────────────────────────
+// Profile page queries
+// ─────────────────────────────────────────────
+
+export async function getUserProfile(userId: string): Promise<Profile | null> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('profiles')
+    .select(`
+      id, full_name, avatar_url, badge_title, star_level,
+      kudos_received_count, kudos_sent_count, hearts_received,
+      department_id,
+      departments!left(name)
+    `)
+    .eq('id', userId)
+    .maybeSingle()
+  if (error) throw error
+  if (!data) return null
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const row = data as any
+  return {
+    id:                   row.id,
+    full_name:            row.full_name,
+    avatar_url:           row.avatar_url,
+    badge_title:          row.badge_title ?? null,
+    star_level:           row.star_level ?? 0,
+    kudos_received_count: row.kudos_received_count ?? 0,
+    kudos_sent_count:     row.kudos_sent_count ?? 0,
+    hearts_received:      row.hearts_received ?? 0,
+    department_id:        row.department_id ?? null,
+    department_name:      row.departments?.name ?? null,
+  }
+}
+
+export async function getProfileKudosFeed(
+  userId: string,
+  filter: ProfileFeedFilter,
+  cursor: string | null,
+): Promise<FeedPage> {
+  const supabase = await createClient()
+  const filterCol = filter === 'sent' ? 'sender_id' : 'receiver_id'
+
+  let query = supabase
+    .from('kudos')
+    .select(`
+      id, content, image_urls, like_count, created_at,
+      is_anonymous, anonymous_nickname,
+      kudos_categories!left(name),
+      sender:profiles!kudos_sender_id_fkey(
+        id, full_name, avatar_url, badge_title, star_level,
+        kudos_received_count, kudos_sent_count,
+        departments!left(name)
+      ),
+      receiver:profiles!kudos_receiver_id_fkey(
+        id, full_name, avatar_url, badge_title, star_level,
+        kudos_received_count, kudos_sent_count,
+        departments!left(name)
+      ),
+      kudos_to_hashtags(kudos_hashtags(name)),
+      kudos_likes(user_id)
+    `)
+    .eq(filterCol, userId)
+    .order('created_at', { ascending: false })
+    .limit(FEED_PAGE_SIZE + 1)
+
+  if (cursor) query = query.lt('created_at', cursor)
+
+  const { data, error } = await query
+  if (error) throw error
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const items = (data ?? []).slice(0, FEED_PAGE_SIZE).map((row: any): KudosFeedItem => ({
+    id:            row.id,
+    sender: {
+      id:                   row.sender.id,
+      full_name:            row.sender.full_name,
+      avatar_url:           row.sender.avatar_url,
+      department_name:      row.sender.departments?.name ?? null,
+      badge_title:          row.sender.badge_title ?? null,
+      star_level:           row.sender.star_level ?? 0,
+      kudos_received_count: row.sender.kudos_received_count ?? 0,
+      kudos_sent_count:     row.sender.kudos_sent_count ?? 0,
+    },
+    receiver: {
+      id:                   row.receiver.id,
+      full_name:            row.receiver.full_name,
+      avatar_url:           row.receiver.avatar_url,
+      department_name:      row.receiver.departments?.name ?? null,
+      badge_title:          row.receiver.badge_title ?? null,
+      star_level:           row.receiver.star_level ?? 0,
+      kudos_received_count: row.receiver.kudos_received_count ?? 0,
+      kudos_sent_count:     row.receiver.kudos_sent_count ?? 0,
+    },
+    content:            row.content,
+    category_name:      row.kudos_categories?.name ?? null,
+    image_urls:         row.image_urls ?? [],
+    hashtags:           row.kudos_to_hashtags
+      ?.map((kth: { kudos_hashtags: { name: string } | null }) => kth.kudos_hashtags?.name)
+      .filter(Boolean) ?? [],
+    like_count:         row.like_count ?? 0,
+    user_liked:         row.kudos_likes?.some((l: { user_id: string }) => l.user_id === userId) ?? false,
+    created_at:         row.created_at,
+    is_anonymous:       row.is_anonymous ?? false,
+    anonymous_nickname: row.anonymous_nickname ?? null,
+    // `status` is not yet in the DB schema; add it to the SELECT above once
+    // a migration adds the kudos.status column, then this will populate.
+    status:             row.status ?? null,
+  }))
+
+  const nextCursor = data && data.length > FEED_PAGE_SIZE
+    ? data[FEED_PAGE_SIZE - 1].created_at
+    : null
+
+  return { items, nextCursor }
 }

@@ -36,6 +36,7 @@ export async function likeKudos(
   ])
 
   revalidatePath('/sun-kudos')
+  revalidatePath('/profile')
   return { success: true, hearts_added }
 }
 
@@ -76,6 +77,7 @@ export async function unlikeKudos(
   }
 
   revalidatePath('/sun-kudos')
+  revalidatePath('/profile')
   return { success: true }
 }
 
@@ -184,4 +186,15 @@ export async function fetchKudosFeed(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { items: [], nextCursor: null }
   return getKudosFeed(filters, cursor, user.id)
+}
+
+export async function fetchProfileKudosFeed(
+  filter: 'sent' | 'received',
+  cursor: string | null,
+) {
+  const { getProfileKudosFeed } = await import('./queries')
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { items: [], nextCursor: null }
+  return getProfileKudosFeed(user.id, filter, cursor)
 }
