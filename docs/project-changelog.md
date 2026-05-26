@@ -4,6 +4,39 @@ All notable changes to the SAA 2025 project are documented here.
 
 ---
 
+## [2026-05-24] Sun* Kudos — Live Board Implementation — COMPLETED
+
+**Version:** 0.3.0
+
+### Added
+- Supabase migrations: `departments`, `kudos_categories`, `kudos_hashtags`, `profiles`, `kudos`, `kudos_images`, `kudos_hearts`
+- Seed data: 10 departments, 6 award categories, 10 hashtags, 4 sample users
+- API data layer (`lib/kudos/`): TypeScript types, SQL queries, server actions
+- KV Banner component: Statistics display (total kudos, new kudos, hearts received)
+- Submit Input component: Receiver autocomplete, content editor, hashtag input with suggestions
+- Filter components: Department, category, hashtag filters with reset functionality
+- Highlight Kudos Carousel: Recent top-starred kudos with badge, user info, action bar
+- Spotlight Board: D3 force-directed graph with interactive tooltips (names, departments)
+- All Kudos Feed: Infinite-scroll pagination with chronological order
+- Sidebar: Statistics block, prize list, active filters
+- Dialogs: Submit kudos modal, receiver search modal, secret box dialog, toast notifications
+- Page route: `/app/sun-kudos/page.tsx` with auth protection
+
+### Security & Data Integrity
+- Server-side validation: content length (≤1000 chars), hashtag count (≤5), image count (≤5)
+- URL validation for image uploads
+- Atomic database counters (6 SQL functions): increment/decrement kudos count, hearts, etc.
+- Cursor type alignment: `string | null` for consistent query pagination
+
+### Technical Details
+- Next.js 16.2.6 Server/Client component split
+- D3 v7 force simulation with 600ms tick cycle
+- Tailwind CSS v4 responsive grid layout
+- Vitest + React Testing Library ready (integration tests deferred)
+- TypeScript strict mode throughout
+
+---
+
 ## [2026-05-21] OAuth Redirect Flow & Middleware Auth — UPDATED
 
 ### Changed
@@ -131,4 +164,5 @@ All notable changes to the SAA 2025 project are documented here.
 |---------|------|-------|--------|
 | 0.1.0 | 2026-05-18 | Auth & Login | Completed |
 | 0.2.0 | 2026-05-19 | Home Page | Completed |
+| 0.3.0 | 2026-05-24 | Sun* Kudos Live Board | Completed |
 | TBD | TBD | Awards & Profile | Planned |
