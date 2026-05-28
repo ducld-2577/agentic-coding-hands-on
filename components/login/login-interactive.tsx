@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { loginTranslations, type Locale } from '@/lib/i18n/login-translations'
+import Link from 'next/link'
 import { LoginHeroSection } from './login-hero-section'
 import { GoogleLoginButton } from './google-login-button'
 
@@ -52,7 +53,24 @@ export function LoginInteractive({ initialLocale }: LoginInteractiveProps) {
       description1={t.description1}
       description2={t.description2}
       loginButtonSlot={
-        <GoogleLoginButton label={t.loginButton} isLoading={isLoading} onClick={handleLogin} />
+        <div className="flex flex-col items-start gap-3">
+          <GoogleLoginButton label={t.loginButton} isLoading={isLoading} onClick={handleLogin} />
+          <Link
+            href="/countdown"
+            className={[
+              'flex items-center justify-center',
+              'h-[60px] px-6 rounded-lg',
+              'border border-[#FFEA9E]',
+              'font-montserrat font-bold text-[18px] leading-[28px]',
+              'text-[#FFEA9E]',
+              'hover:bg-[rgba(255,234,158,0.1)]',
+              'transition-colors duration-200 ease-in-out',
+              'whitespace-nowrap min-w-[200px]',
+            ].join(' ')}
+          >
+            {t.countdownLink}
+          </Link>
+        </div>
       }
     />
   )

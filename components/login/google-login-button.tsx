@@ -83,10 +83,10 @@ export function GoogleLoginButton({ label, isLoading, onClick }: GoogleLoginButt
         'w-auto min-w-[200px] h-[60px] whitespace-nowrap',
       ].join(' ')}
     >
+      <span>{label}</span>
       <span className="flex-shrink-0">
         {isLoading ? <LoadingSpinner /> : <GoogleIcon />}
       </span>
-      <span>{label}</span>
     </button>
   )
 }
