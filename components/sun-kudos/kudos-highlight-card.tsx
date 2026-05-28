@@ -32,7 +32,7 @@ export function KudosHighlightCard({
 
   return (
     <div
-      className="flex flex-col gap-3 p-5 overflow-hidden"
+      className="flex flex-col gap-3 p-5"
       style={{
         width: '528px',
         height: '525px',

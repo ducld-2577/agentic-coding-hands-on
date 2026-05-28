@@ -48,8 +48,6 @@ export function KudosBadge({ badge }: KudosBadgeProps) {
           alt={config.title}
           width={90}
           height={28}
-          className="object-contain"
-          style={{ maxHeight: 28 }}
         />
       </span>
 
@@ -70,8 +68,7 @@ export function KudosBadge({ badge }: KudosBadgeProps) {
             alt={config.title}
             width={120}
             height={36}
-            className="object-contain mx-auto"
-            style={{ maxHeight: 36 }}
+            className="mx-auto"
           />
           <span
             className="font-semibold text-white text-xs leading-tight mt-1"

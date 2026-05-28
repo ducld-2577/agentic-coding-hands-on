@@ -33,7 +33,6 @@ export function HomeHeader({ user }: HomeHeaderProps) {
           alt="SAA 2025"
           width={47}
           height={44}
-          className="object-contain"
           priority
         />
       </Link>

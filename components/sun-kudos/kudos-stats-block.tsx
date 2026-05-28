@@ -46,7 +46,7 @@ export function KudosStatsBlock({ stats, onOpenSecretBox }: KudosStatsBlockProps
           <span className="text-sm font-bold" style={{ color: '#F5C842' }}>
             {stats.hearts}
           </span>
-          <Image src="/kudos/x2.png" alt="×2" width={32} height={20} className="object-contain" />
+          <Image src="/kudos/x2.png" alt="×2" width={32} height={20} />
         </div>
       </div>
 
