@@ -20,7 +20,7 @@ export function AwardsKeyvisual() {
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: 'url(/awards-information/keyvisual-bg.png), url(/login/keyvisual-bg.png)',
+            backgroundImage: 'url(/awards-information/keyvisual.png), url(/login/keyvisual-bg.png)',
             backgroundSize: 'cover',
             backgroundPosition: 'center top',
             backgroundRepeat: 'no-repeat',

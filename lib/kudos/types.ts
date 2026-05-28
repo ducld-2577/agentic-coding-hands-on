@@ -56,7 +56,11 @@ export interface KudosFeedItem {
   created_at: string
   is_anonymous: boolean
   anonymous_nickname: string | null
+  /** Optional — populated when the kudos has been flagged/reported */
+  status?: string | null
 }
+
+export type ProfileFeedFilter = 'sent' | 'received'
 
 export interface KudosStats {
   received: number

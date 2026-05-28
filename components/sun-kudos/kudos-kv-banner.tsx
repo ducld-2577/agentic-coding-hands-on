@@ -2,6 +2,8 @@
 
 import Image from 'next/image'
 import { PenLine, Search } from 'lucide-react'
+import { useLocale } from '@/lib/i18n/use-locale'
+import { kudosTranslations } from '@/lib/i18n/kudos-translations'
 
 const inputBase: React.CSSProperties = {
   height: '72px',
@@ -21,6 +23,9 @@ interface KudosKvBannerProps {
 }
 
 export function KudosKvBanner({ onOpenKudos }: KudosKvBannerProps) {
+  const locale = useLocale()
+  const t = kudosTranslations[locale]
+
   return (
     <section
       aria-label="Kudos key visual banner"
@@ -55,7 +60,7 @@ export function KudosKvBanner({ onOpenKudos }: KudosKvBannerProps) {
             className="font-montserrat font-bold"
             style={{ color: '#F5C842', fontSize: '28px', lineHeight: '36px' }}
           >
-            Hệ thống ghi nhận và cảm ơn
+            {t.kvTagline}
           </p>
           <Image
             src="/kudos/kudos-logo.png"
@@ -73,7 +78,7 @@ export function KudosKvBanner({ onOpenKudos }: KudosKvBannerProps) {
           <div
             role="button"
             tabIndex={0}
-            aria-label="Mở form gửi lời cảm ơn"
+            aria-label={t.submitAriaLabel}
             onClick={onOpenKudos}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') onOpenKudos()
@@ -86,20 +91,18 @@ export function KudosKvBanner({ onOpenKudos }: KudosKvBannerProps) {
               className="font-montserrat truncate"
               style={{ color: 'rgba(255,255,255,0.5)', fontSize: '15px', lineHeight: '24px' }}
             >
-              Hôm nay, bạn muốn gửi lời cảm ơn và ghi nhận đến ai?
+              {t.submitPlaceholder}
             </span>
           </div>
 
           {/* Search Sunner profile — narrower (381/1151 ≈ 33%) */}
-          <div
-            style={{ ...inputBase, flexGrow: 381 }}
-          >
+          <div style={{ ...inputBase, flexGrow: 381 }}>
             <Search size={20} aria-hidden="true" style={{ color: 'rgba(255,255,255,0.5)', flexShrink: 0 }} />
             <span
               className="font-montserrat truncate"
               style={{ color: 'rgba(255,255,255,0.5)', fontSize: '15px', lineHeight: '24px' }}
             >
-              Tìm kiếm profile Sunner
+              {t.searchPlaceholder}
             </span>
           </div>
         </div>

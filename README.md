@@ -177,6 +177,80 @@ npx supabase db reset
 **Port conflict (54321, 54322, 54323)**
 → Dừng Supabase bằng `npx supabase stop`, kiểm tra process đang chiếm port, sau đó start lại.
 
+## Deploy lên Supabase Cloud
+
+### 1. Tạo project trên Supabase Cloud
+
+1. Đăng nhập tại [supabase.com](https://supabase.com) → **New project**
+2. Ghi lại **Project URL** và **anon key** từ **Project Settings → API**
+
+### 2. Link project với Supabase CLI
+
+```bash
+npx supabase login
+npx supabase link --project-ref <project-id>
+```
+
+> `project-id` là chuỗi ký tự trong URL: `https://supabase.com/dashboard/project/<project-id>`
+
+### 3. Cấu hình biến môi trường cho cloud
+
+Tạo hoặc cập nhật `.env.local` với thông tin từ Supabase Cloud:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://<project-id>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon key từ Project Settings → API>
+
+# Google OAuth (nếu dùng)
+SUPABASE_AUTH_GOOGLE_CLIENT_ID=<your-client-id>
+SUPABASE_AUTH_GOOGLE_SECRET=<your-client-secret>
+```
+
+### 4. Push database migrations
+
+```bash
+npx supabase db push
+```
+
+Lệnh này apply tất cả migration trong `supabase/migrations/` lên cloud (schema + lookup data).
+
+### 5. Seed demo data lên cloud
+
+```bash
+npx supabase db query --linked -f supabase/seed.sql
+```
+
+Lệnh này tạo toàn bộ demo data: auth users, profiles, kudos, likes, prizes.
+
+### 6. Cấu hình Google OAuth cho cloud (nếu dùng)
+
+1. Trên Google Cloud Console, thêm **Authorized redirect URI**:
+   ```
+   https://<project-id>.supabase.co/auth/v1/callback
+   ```
+2. Trên Supabase Dashboard → **Authentication → Providers → Google**, nhập Client ID và Secret
+3. Thêm production URL vào **Authentication → URL Configuration**:
+   - **Site URL**: `https://<your-domain>`
+   - **Redirect URLs**: `https://<your-domain>/auth/callback`
+
+### 7. Cập nhật database sau này
+
+```bash
+# Tạo migration mới
+npx supabase migration new <tên-thay-đổi>
+# Viết SQL vào file vừa tạo trong supabase/migrations/
+
+# Test local trước
+npx supabase db reset
+
+# Push lên cloud
+npx supabase db push
+```
+
+> **Lưu ý:** Không sửa trực tiếp migration đã push. Mọi thay đổi schema phải tạo migration mới.
+
+---
+
 ## Đóng góp
 
 1. Tạo branch từ `main` theo quy ước: `feature/<slug>`, `fix/<slug>`

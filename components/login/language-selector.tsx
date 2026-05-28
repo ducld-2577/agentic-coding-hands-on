@@ -6,8 +6,8 @@ import type { Locale } from '@/lib/i18n/login-translations'
 const LOCALE_COOKIE = 'locale'
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 365 // 1 year
 
-const LOCALE_OPTIONS: { value: Locale; label: string; flag: string }[] = [
-  { value: 'VN', label: 'VN', flag: '🇻🇳' },
+const LOCALE_OPTIONS: { value: Locale; label: string; flag: string; flagSrc?: string }[] = [
+  { value: 'VN', label: 'VN', flag: '🇻🇳', flagSrc: '/login/VN.svg' },
   { value: 'EN', label: 'EN', flag: '🇬🇧' },
 ]
 
@@ -85,9 +85,12 @@ export function LanguageSelector({ defaultLocale = 'VN' }: LanguageSelectorProps
         <span className="flex items-center gap-1">
           {/* mm:I662:14391;186:1696;186:1821;186:1709 */}
           {/* mm:I662:14391;186:1696;186:1821;186:1441 */}
-          <span className="text-xl leading-none flex-shrink-0" aria-hidden="true">
-            {current.flag}
-          </span>
+          {current.flagSrc ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={current.flagSrc} width={24} height={24} alt="" aria-hidden="true" className="flex-shrink-0" />
+          ) : (
+            <span className="text-xl leading-none flex-shrink-0" aria-hidden="true">{current.flag}</span>
+          )}
           <span className="text-white font-bold font-montserrat text-base leading-6 tracking-[0.15px]">
             {current.label}
           </span>
@@ -121,7 +124,12 @@ export function LanguageSelector({ defaultLocale = 'VN' }: LanguageSelectorProps
                   : 'hover:bg-white/10',
               ].join(' ')}
             >
-              <span className="text-lg leading-none">{option.flag}</span>
+              {option.flagSrc ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={option.flagSrc} width={24} height={24} alt="" aria-hidden="true" className="flex-shrink-0" />
+              ) : (
+                <span className="text-lg leading-none">{option.flag}</span>
+              )}
               <span>{option.label}</span>
             </li>
           ))}

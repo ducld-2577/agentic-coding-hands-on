@@ -15,17 +15,17 @@ export function HomeHeader({ user }: HomeHeaderProps) {
     <header
       className={[
         'fixed top-0 left-0 right-0 z-30',
-        'grid grid-cols-[1fr_auto_1fr] items-center',
+        'flex items-center',
         'w-full h-[72px]',
         'px-4 sm:px-8 md:px-[72px] lg:px-[144px]',
         'bg-[rgba(11,15,18,0.92)] backdrop-blur-sm',
         'border-b border-white/5',
       ].join(' ')}
     >
-      {/* Logo — left column */}
+      {/* Logo */}
       <Link
         href="/home"
-        className="justify-self-start focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white rounded"
+        className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white rounded shrink-0"
         aria-label="SAA 2025 — Go to home"
       >
         <Image
@@ -38,18 +38,21 @@ export function HomeHeader({ user }: HomeHeaderProps) {
         />
       </Link>
 
-      {/* Nav links — center column (always truly centered) */}
-      <HomeNavLinks />
+      {/* Nav links — right after logo with gap */}
+      <div className="ml-6">
+        <HomeNavLinks />
+      </div>
 
-      {/* Controls — right column */}
-      <div className="justify-self-end flex items-center gap-2">
+      {/* Controls — pushed to the right: Bell → Language → Account */}
+      <div className="ml-auto flex items-center gap-2">
+        {user !== null && (
+          <HomeNotificationBell />
+        )}
+
         <LanguageSelector defaultLocale="VN" />
 
         {user !== null && (
-          <>
-            <HomeNotificationBell />
-            <HomeAccountMenu user={user} />
-          </>
+          <HomeAccountMenu user={user} />
         )}
       </div>
     </header>

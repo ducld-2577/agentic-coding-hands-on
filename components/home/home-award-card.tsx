@@ -4,9 +4,10 @@ import type { AwardCategory } from '@/lib/data/award-categories'
 
 interface HomeAwardCardProps {
   award: AwardCategory
+  detailsLabel: string
 }
 
-export function HomeAwardCard({ award }: HomeAwardCardProps) {
+export function HomeAwardCard({ award, detailsLabel }: HomeAwardCardProps) {
   const href = `/awards-information#${award.slug}`
 
   return (
@@ -63,9 +64,9 @@ export function HomeAwardCard({ award }: HomeAwardCardProps) {
         {award.description}
       </p>
 
-      {/* Chi tiết link */}
+      {/* Details link */}
       <span className="flex items-center gap-1 text-sm text-yellow-400 font-semibold font-montserrat mt-auto">
-        Chi tiết
+        {detailsLabel}
         <svg
           width="16"
           height="16"

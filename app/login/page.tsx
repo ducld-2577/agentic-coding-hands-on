@@ -21,13 +21,20 @@ export default async function LoginPage() {
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: 'url(/login/keyvisual-bg.png)',
-            backgroundSize: '159.763% 133.371%',
-            backgroundPosition: '-440px -217.975px',
+            backgroundImage: 'url(/login/image%201.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
           }}
         />
-        {/* Cover gradient overlay */}
+        {/* Horizontal gradient overlay — darkens left side for text readability */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(90deg, #00101A 0%, #00101A 25.41%, rgba(0, 16, 26, 0.00) 100%)',
+          }}
+        />
+        {/* Cover gradient overlay — darkens bottom */}
         <div
           className="absolute w-full"
           style={{

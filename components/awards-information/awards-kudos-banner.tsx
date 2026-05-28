@@ -1,5 +1,10 @@
+'use client'
+
 import Image from 'next/image'
 import Link from 'next/link'
+import { useLocale } from '@/lib/i18n/use-locale'
+import { homeTranslations } from '@/lib/i18n/home-translations'
+import { homeContentTranslations } from '@/lib/i18n/home-content-translations'
 
 /**
  * Section D1 — Sun* Kudos promotional banner.
@@ -8,9 +13,12 @@ import Link from 'next/link'
  * Right: kudos-logo.png
  *
  * Extracted from Figma node 335:12023 (D1_Sunkudos).
- * Exact description text from Figma node I335:12023;313:8423.
  */
 export function AwardsKudosBanner() {
+  const locale = useLocale()
+  const t = homeTranslations[locale]
+  const tc = homeContentTranslations[locale]
+
   return (
     <section
       aria-label="Sun* Kudos"
@@ -31,7 +39,7 @@ export function AwardsKudosBanner() {
         {/* Background image */}
         <div className="absolute inset-0" aria-hidden="true">
           <Image
-            src="/kudos/kudos-bg.png"
+            src="/kudos/MM_MEDIA_Kudos Background.png"
             alt=""
             fill
             className="object-cover"
@@ -53,7 +61,7 @@ export function AwardsKudosBanner() {
                 className="font-montserrat font-bold text-white"
                 style={{ fontSize: '24px', lineHeight: '32px' }}
               >
-                Phong trào ghi nhận
+                {t.kudos.movementLabel}
               </p>
 
               {/* Title */}
@@ -68,7 +76,7 @@ export function AwardsKudosBanner() {
                 Sun* Kudos
               </h2>
 
-              {/* Description — exact text from Figma */}
+              {/* Description */}
               <p
                 className="font-montserrat font-bold text-white"
                 style={{
@@ -78,10 +86,9 @@ export function AwardsKudosBanner() {
                   textAlign: 'justify',
                 }}
               >
-                {'ĐIỂM MỚI CỦA SAA 2025\n'}
-                {
-                  'Hoạt động ghi nhận và cảm ơn đồng nghiệp - lần đầu tiên được diễn ra dành cho tất cả Sunner. Hoạt động sẽ được triển khai vào tháng 11/2025, khuyến khích người Sun* chia sẻ những lời ghi nhận, cảm ơn đồng nghiệp trên hệ thống do BTC công bố. Đây sẽ là chất liệu để Hội đồng Heads tham khảo trong quá trình lựa chọn người đạt giải.'
-                }
+                {t.kudos.newFeatureLabel}
+                {'\n'}
+                {tc.kudosDescription}
               </p>
             </div>
 
@@ -98,7 +105,7 @@ export function AwardsKudosBanner() {
                 ].join(' ')}
                 style={{ fontSize: '16px', lineHeight: '24px', letterSpacing: '0.15px' }}
               >
-                Chi tiết
+                {t.details}
               </Link>
             </div>
           </div>

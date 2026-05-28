@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 
+// /countdown is intentionally public — prelaunch page requires no authentication.
 export const PUBLIC_ROUTES: string[] = ['/login', '/auth/callback', '/auth/callback/close']
 export const PROTECTED_ROUTES: string[] = [
   '/home',
@@ -11,6 +12,16 @@ export const PROTECTED_ROUTES: string[] = [
 ]
 
 export default async function proxy(req: NextRequest) {
+  const path = req.nextUrl.pathname
+
+  // Skip session refresh for auth callback routes — the route handler manages
+  // its own session via exchangeCodeForSession. Running getUser() here with
+  // stale cookies would emit Set-Cookie clearing headers that override the fresh
+  // session cookies set by the callback, causing the first login to fail.
+  if (path.startsWith('/auth/callback')) {
+    return NextResponse.next({ request: req })
+  }
+
   // supabaseResponse must be returned (not a plain NextResponse.next()) so that
   // any session-refresh Set-Cookie headers are propagated to the browser.
   let supabaseResponse = NextResponse.next({ request: req })
@@ -41,8 +52,6 @@ export default async function proxy(req: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser()
-
-  const path = req.nextUrl.pathname
 
   // Redirect authenticated users away from login page.
   if (path === '/login' && user) {

@@ -4,6 +4,8 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { X, Gift } from 'lucide-react'
 import { openSecretBox } from '@/lib/kudos/actions'
 import type { SecretBox } from '@/lib/kudos/types'
+import { useLocale } from '@/lib/i18n/use-locale'
+import { kudosTranslations } from '@/lib/i18n/kudos-translations'
 
 interface BoxState {
   id: string
@@ -34,6 +36,8 @@ export function KudosSecretBoxDialog({ open, onClose, secretBoxes }: KudosSecret
   const [error, setError] = useState<string | null>(null)
   const firstFocusRef = useRef<HTMLButtonElement>(null)
   const shakeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const locale = useLocale()
+  const t = kudosTranslations[locale]
 
   useEffect(() => () => { if (shakeTimerRef.current) clearTimeout(shakeTimerRef.current) }, [])
 
@@ -61,8 +65,8 @@ export function KudosSecretBoxDialog({ open, onClose, secretBoxes }: KudosSecret
   async function handleOpen(boxId: string) {
     setShakingId(boxId)
     setBoxes(prev => prev.map(b => b.id === boxId ? { ...b, opening: true } : b))
-    const t = setTimeout(() => setShakingId(null), 600)
-    shakeTimerRef.current = t
+    const timer = setTimeout(() => setShakingId(null), 600)
+    shakeTimerRef.current = timer
 
     try {
       const result = await openSecretBox(boxId)
@@ -79,7 +83,7 @@ export function KudosSecretBoxDialog({ open, onClose, secretBoxes }: KudosSecret
         )
       )
     } catch {
-      setError('Đã xảy ra lỗi. Vui lòng thử lại.')
+      setError(t.errorMessage)
       setBoxes(prev => prev.map(b => b.id === boxId ? { ...b, opening: false } : b))
     }
   }
@@ -117,18 +121,18 @@ export function KudosSecretBoxDialog({ open, onClose, secretBoxes }: KudosSecret
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Secret Box"
+          aria-label={t.secretBoxDialogLabel}
           className="relative rounded-2xl p-8 w-full overflow-y-auto"
           style={{ background: '#0D1F2D', maxWidth: 480, maxHeight: '90vh', border: '1px solid rgba(255,255,255,0.12)' }}
           onClick={e => e.stopPropagation()}
         >
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-bold text-white">Secret Box</h2>
+            <h2 className="text-lg font-bold text-white">{t.secretBoxDialogLabel}</h2>
             <button
               ref={firstFocusRef}
               type="button"
               onClick={onClose}
-              aria-label="Đóng"
+              aria-label={t.closeAriaLabel}
               style={{ color: 'rgba(255,255,255,0.5)' }}
             >
               <X size={20} />
@@ -141,7 +145,7 @@ export function KudosSecretBoxDialog({ open, onClose, secretBoxes }: KudosSecret
 
           {boxes.length === 0 ? (
             <p className="text-sm text-center py-8" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              Bạn chưa có Secret Box nào chưa mở
+                {t.noSecretBoxes}
             </p>
           ) : (
             <div className="flex flex-col gap-3">
@@ -168,7 +172,7 @@ export function KudosSecretBoxDialog({ open, onClose, secretBoxes }: KudosSecret
                           className="text-sm font-medium"
                           style={{ color: box.is_opened ? 'rgba(255,255,255,0.5)' : 'white' }}
                         >
-                          Secret Box #{idx + 1}
+                          {t.secretBoxPrefix}{idx + 1}
                         </span>
                       </div>
 
@@ -177,7 +181,7 @@ export function KudosSecretBoxDialog({ open, onClose, secretBoxes }: KudosSecret
                           className="text-xs px-2 py-1 rounded-full"
                           style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.4)' }}
                         >
-                          Đã mở
+                          {t.openedBadge}
                         </span>
                       ) : (
                         <button
@@ -191,7 +195,7 @@ export function KudosSecretBoxDialog({ open, onClose, secretBoxes }: KudosSecret
                             opacity: box.opening ? 0.6 : 1,
                           }}
                         >
-                          {box.opening ? 'Đang mở...' : 'Mở'}
+                          {box.opening ? t.openingButton : t.openButton}
                         </button>
                       )}
                     </div>
@@ -210,7 +214,7 @@ export function KudosSecretBoxDialog({ open, onClose, secretBoxes }: KudosSecret
                         className="text-sm pl-8"
                         style={{ color: 'rgba(255,255,255,0.4)' }}
                       >
-                        Không có phần thưởng
+                        {t.noPrize}
                       </p>
                     )}
                   </div>
