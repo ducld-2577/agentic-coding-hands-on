@@ -355,37 +355,43 @@ export async function getKudosStats(userId: string): Promise<KudosStats> {
 
 export async function getSpotlightData(): Promise<SpotlightNode[]> {
   const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('id, full_name, avatar_url, kudos_received_count')
-    .gt('kudos_received_count', 0)
-    .order('kudos_received_count', { ascending: false })
-  if (error) throw error
 
-  // Get last received_at per profile
-  const profileIds = (data ?? []).map(p => p.id)
-  if (profileIds.length === 0) return []
-
-  const { data: lastKudos } = await supabase
+  // Count directly from kudos table so historical data is included.
+  // profiles.kudos_received_count only tracks kudos submitted after deployment.
+  const { data: kudosRows, error } = await supabase
     .from('kudos')
     .select('receiver_id, created_at')
-    .in('receiver_id', profileIds)
     .order('created_at', { ascending: false })
+  if (error) throw error
+  if (!kudosRows || kudosRows.length === 0) return []
 
-  const lastReceivedMap = new Map<string, string>()
-  for (const k of lastKudos ?? []) {
-    if (!lastReceivedMap.has(k.receiver_id)) {
-      lastReceivedMap.set(k.receiver_id, k.created_at)
+  // Aggregate count and most-recent timestamp per receiver (rows are DESC so first hit = latest)
+  const receiverMap = new Map<string, { count: number; last_received_at: string }>()
+  for (const row of kudosRows) {
+    const existing = receiverMap.get(row.receiver_id)
+    if (existing) {
+      existing.count++
+    } else {
+      receiverMap.set(row.receiver_id, { count: 1, last_received_at: row.created_at })
     }
   }
 
-  return (data ?? []).map(p => ({
-    id:              p.id,
-    name:            p.full_name,
-    avatar_url:      p.avatar_url,
-    kudos_count:     p.kudos_received_count,
-    last_received_at: lastReceivedMap.get(p.id) ?? null,
-  }))
+  const profileIds = Array.from(receiverMap.keys())
+  const { data: profiles, error: profilesError } = await supabase
+    .from('profiles')
+    .select('id, full_name, avatar_url')
+    .in('id', profileIds)
+  if (profilesError) throw profilesError
+
+  return (profiles ?? [])
+    .map((p) => ({
+      id:               p.id,
+      name:             p.full_name,
+      avatar_url:       p.avatar_url,
+      kudos_count:      receiverMap.get(p.id)?.count ?? 0,
+      last_received_at: receiverMap.get(p.id)?.last_received_at ?? null,
+    }))
+    .sort((a, b) => b.kudos_count - a.kudos_count)
 }
 
 export async function getKudosTotalCount(): Promise<number> {
