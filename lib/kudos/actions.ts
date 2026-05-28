@@ -170,31 +170,43 @@ export async function openSecretBox(
 export async function fetchHighlightKudos(
   filters: { hashtag_ids: number[]; department_id: number | null },
 ) {
-  const { getHighlightKudos } = await import('./queries')
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return []
-  return getHighlightKudos(filters, user.id)
+  try {
+    const { getHighlightKudos } = await import('./queries')
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return []
+    return getHighlightKudos(filters, user.id)
+  } catch {
+    return []
+  }
 }
 
 export async function fetchKudosFeed(
   cursor: string | null,
   filters: { hashtag_ids: number[]; department_id: number | null },
 ) {
-  const { getKudosFeed } = await import('./queries')
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { items: [], nextCursor: null }
-  return getKudosFeed(filters, cursor, user.id)
+  try {
+    const { getKudosFeed } = await import('./queries')
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { items: [], nextCursor: null }
+    return getKudosFeed(filters, cursor, user.id)
+  } catch {
+    return { items: [], nextCursor: null }
+  }
 }
 
 export async function fetchProfileKudosFeed(
   filter: 'sent' | 'received',
   cursor: string | null,
 ) {
-  const { getProfileKudosFeed } = await import('./queries')
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { items: [], nextCursor: null }
-  return getProfileKudosFeed(user.id, filter, cursor)
+  try {
+    const { getProfileKudosFeed } = await import('./queries')
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { items: [], nextCursor: null }
+    return getProfileKudosFeed(user.id, filter, cursor)
+  } catch {
+    return { items: [], nextCursor: null }
+  }
 }

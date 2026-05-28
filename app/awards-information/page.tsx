@@ -1,8 +1,11 @@
+import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { HomeHeader } from '@/components/home/home-header'
 import { HomeFooter } from '@/components/home/home-footer'
 import { AwardsKeyvisual } from '@/components/awards-information/awards-keyvisual'
+
+export const metadata: Metadata = { title: 'Awards' }
 import { AwardsTitleSection } from '@/components/awards-information/awards-title-section'
 import { AwardsSystemSection } from '@/components/awards-information/awards-system-section'
 import { AwardsKudosBanner } from '@/components/awards-information/awards-kudos-banner'

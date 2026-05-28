@@ -43,4 +43,16 @@ describe('validateRedirectPath — open redirect prevention', () => {
       expect(validateRedirectPath('//evil.com', '/login')).toBe('/login')
     })
   })
+
+  describe('blocks other injection vectors', () => {
+    it.each([
+      'javascript:alert(1)',
+      'data:text/html,<script>alert(1)</script>',
+      ' /home',   // leading space — not a valid relative path
+      '\n/home',  // newline prefix
+      'vbscript:msgbox(1)',
+    ])('blocks "%s"', (path) => {
+      expect(validateRedirectPath(path)).toBe('/home')
+    })
+  })
 })

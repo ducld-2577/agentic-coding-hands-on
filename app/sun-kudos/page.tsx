@@ -1,8 +1,11 @@
+import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { HomeHeader } from '@/components/home/home-header'
 import { HomeFooter } from '@/components/home/home-footer'
 import { KudosLiveBoardClient } from '@/components/sun-kudos/kudos-live-board-client'
+
+export const metadata: Metadata = { title: 'Sun Kudos' }
 import {
   getHighlightKudos, getKudosFeed, getKudosStats, getSpotlightData,
   getKudosTotalCount, getDepartments, getHashtags, getKudosCategories,
