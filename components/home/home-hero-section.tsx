@@ -19,18 +19,18 @@ export function HomeHeroSection() {
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: 'url(/login/keyvisual-bg.png)',
+            backgroundImage: 'url(/home/mm_keyvisual.png)',
             backgroundSize: 'cover',
             backgroundPosition: 'center top',
             backgroundRepeat: 'no-repeat',
           }}
         />
-        {/* Dark gradient overlay — bottom fade to page background */}
+        {/* Dark gradient overlay — matches design Cover: 12deg, dark at bottom, transparent at top */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(0deg, #00101A 10%, rgba(0,16,26,0.55) 55%, rgba(0,16,26,0.2) 100%)',
+              'linear-gradient(12deg, #00101A 23.7%, rgba(0, 18, 29, 0.46) 38.34%, rgba(0, 19, 32, 0.00) 48.92%)',
           }}
         />
       </div>
@@ -41,7 +41,7 @@ export function HomeHeroSection() {
           'relative z-10 flex flex-col justify-end',
           'flex-1',
           'px-4 sm:px-8 md:px-[72px] lg:px-[144px]',
-          'pt-[120px] pb-[60px] md:pt-[160px] md:pb-[80px]',
+          'pt-[120px] pb-[80px] md:pt-[160px] md:pb-[120px]',
           'gap-10 md:gap-14',
         ].join(' ')}
       >
