@@ -1,17 +1,22 @@
 'use client'
 
 import { PenLine } from 'lucide-react'
+import { useLocale } from '@/lib/i18n/use-locale'
+import { kudosTranslations } from '@/lib/i18n/kudos-translations'
 
 interface KudosSubmitInputProps {
   onOpen: () => void
 }
 
 export function KudosSubmitInput({ onOpen }: KudosSubmitInputProps) {
+  const locale = useLocale()
+  const t = kudosTranslations[locale]
+
   return (
     <div
       role="button"
       tabIndex={0}
-      aria-label="Mở form gửi lời cảm ơn"
+      aria-label={t.submitAriaLabel}
       onClick={onOpen}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') onOpen()
@@ -35,7 +40,7 @@ export function KudosSubmitInput({ onOpen }: KudosSubmitInputProps) {
         className="font-montserrat"
         style={{ color: 'rgba(255,255,255,0.5)', fontSize: '15px', lineHeight: '24px' }}
       >
-        Hôm nay, bạn muốn gửi lời cảm ơn và ghi nhận đến ai?
+        {t.submitPlaceholder}
       </span>
     </div>
   )

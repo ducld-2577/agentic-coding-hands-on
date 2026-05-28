@@ -4,6 +4,8 @@ import { useRef, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
+import { useLocale } from '@/lib/i18n/use-locale'
+import { homeTranslations } from '@/lib/i18n/home-translations'
 
 interface HomeAccountMenuProps {
   user: User
@@ -46,6 +48,8 @@ function UserCircleIcon() {
 export function HomeAccountMenu({ user }: HomeAccountMenuProps) {
   const [open, setOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const locale = useLocale()
+  const t = homeTranslations[locale].account
 
   const isAdmin = user.app_metadata?.role === 'admin'
 
@@ -90,7 +94,7 @@ export function HomeAccountMenu({ user }: HomeAccountMenuProps) {
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="menu"
         aria-expanded={open}
-        aria-label="Account menu"
+        aria-label={t.profile}
         className={[
           'flex items-center justify-center',
           'w-10 h-10 rounded-full',
@@ -104,7 +108,7 @@ export function HomeAccountMenu({ user }: HomeAccountMenuProps) {
       {open && (
         <ul
           role="menu"
-          aria-label="Account options"
+          aria-label={t.profile}
           className={[
             'absolute right-0 top-full mt-2 z-50',
             'bg-[#0B0F12] border border-[#2E3940] rounded',
@@ -120,7 +124,7 @@ export function HomeAccountMenu({ user }: HomeAccountMenuProps) {
               onClick={() => setOpen(false)}
               className="flex items-center px-4 py-3 text-sm text-white font-montserrat hover:bg-white/10 transition-colors duration-150"
             >
-              Profile
+              {t.profile}
             </Link>
           </li>
 
@@ -131,7 +135,7 @@ export function HomeAccountMenu({ user }: HomeAccountMenuProps) {
               onClick={handleSignOut}
               className="flex items-center w-full px-4 py-3 text-sm text-red-400 font-montserrat hover:bg-white/10 transition-colors duration-150 text-left"
             >
-              Sign out
+              {t.signOut}
             </button>
           </li>
 
@@ -143,7 +147,7 @@ export function HomeAccountMenu({ user }: HomeAccountMenuProps) {
                 onClick={() => setOpen(false)}
                 className="flex items-center px-4 py-3 text-sm text-white font-montserrat hover:bg-white/10 transition-colors duration-150"
               >
-                Admin Dashboard
+                {t.adminDashboard}
               </Link>
             </li>
           )}

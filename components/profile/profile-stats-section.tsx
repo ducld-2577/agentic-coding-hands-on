@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { KudosSecretBoxDialog } from '@/components/sun-kudos/kudos-secret-box-dialog'
 import type { KudosStats, SecretBox } from '@/lib/kudos/types'
+import { useLocale } from '@/lib/i18n/use-locale'
+import { profileTranslations } from '@/lib/i18n/profile-translations'
 
 interface ProfileStatsSectionProps {
   stats: KudosStats
@@ -24,6 +26,8 @@ function StatRow({ label, value }: { label: string; value: number }) {
 
 export function ProfileStatsSection({ stats, secretBoxes }: ProfileStatsSectionProps) {
   const [dialogOpen, setDialogOpen] = useState(false)
+  const locale = useLocale()
+  const t = profileTranslations[locale]
 
   return (
     <>
@@ -34,14 +38,14 @@ export function ProfileStatsSection({ stats, secretBoxes }: ProfileStatsSectionP
           border: '1px solid rgba(255,255,255,0.08)',
         }}
       >
-        <StatRow label="Số kudos bạn nhận được:" value={stats.received} />
-        <StatRow label="Số kudos bạn đã gửi:" value={stats.sent} />
-        <StatRow label="Số tim bạn nhận được:" value={stats.hearts} />
+        <StatRow label={t.kudosReceived} value={stats.received} />
+        <StatRow label={t.kudosSent} value={stats.sent} />
+        <StatRow label={t.heartsReceived} value={stats.hearts} />
 
         <hr className="my-2" style={{ borderColor: 'rgba(255,255,255,0.08)' }} />
 
-        <StatRow label="Secret Box bạn đã mở:" value={stats.opened_boxes} />
-        <StatRow label="Secret Box chưa mở:" value={stats.unopened_boxes} />
+        <StatRow label={t.secretBoxesOpened} value={stats.opened_boxes} />
+        <StatRow label={t.secretBoxesUnopened} value={stats.unopened_boxes} />
 
         {stats.unopened_boxes > 0 && (
           <button
@@ -50,7 +54,7 @@ export function ProfileStatsSection({ stats, secretBoxes }: ProfileStatsSectionP
             className="w-full mt-3 py-2.5 font-montserrat text-sm font-bold rounded-full transition-opacity hover:opacity-90"
             style={{ background: '#F5C842', color: '#1A1A1A' }}
           >
-            Mở Secret Box 🎁
+            {t.openSecretBox}
           </button>
         )}
       </div>

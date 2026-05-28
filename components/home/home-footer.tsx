@@ -3,16 +3,21 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-
-const NAV_ITEMS = [
-  { label: 'About SAA 2025', href: '/home' },
-  { label: 'Awards Information', href: '/awards-information' },
-  { label: 'Sun* Kudos', href: '/sun-kudos' },
-  { label: 'Tiêu chuẩn chung', href: '/tieu-chuan-chung' },
-] as const
+import { useLocale } from '@/lib/i18n/use-locale'
+import { homeTranslations } from '@/lib/i18n/home-translations'
 
 export function HomeFooter() {
   const pathname = usePathname()
+  const locale = useLocale()
+  const t = homeTranslations[locale]
+
+  const NAV_ITEMS = [
+    { label: 'About SAA 2025', href: '/home' },
+    { label: 'Awards Information', href: '/awards-information' },
+    { label: 'Sun* Kudos', href: '/sun-kudos' },
+    { label: t.footer.generalStandards, href: '/tieu-chuan-chung' },
+  ] as const
+
   return (
     <footer
       className={[
@@ -34,7 +39,7 @@ export function HomeFooter() {
         <Link
           href="/home"
           className="flex-shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5C518] rounded"
-          aria-label="SAA 2025 — về trang chủ"
+          aria-label={t.footer.logoAriaLabel}
         >
           <Image
             src="/login/Logo.png"
@@ -84,7 +89,7 @@ export function HomeFooter() {
             'text-white/60 text-left md:text-right whitespace-nowrap',
           ].join(' ')}
         >
-          Bản quyền thuộc về Sun* © 2025
+          {t.footer.copyright}
         </p>
       </div>
     </footer>

@@ -1,6 +1,10 @@
+'use client'
+
 import Image from 'next/image'
 import { KudosBadge } from '@/components/sun-kudos/kudos-badge'
 import type { Profile } from '@/lib/kudos/types'
+import { useLocale } from '@/lib/i18n/use-locale'
+import { profileTranslations } from '@/lib/i18n/profile-translations'
 
 interface ProfileHeroSectionProps {
   profile: Profile | null
@@ -26,6 +30,8 @@ const BADGE_PLACEHOLDER_COUNT = 6
 
 export function ProfileHeroSection({ profile }: ProfileHeroSectionProps) {
   const name = profile?.full_name ?? 'Unknown'
+  const locale = useLocale()
+  const t = profileTranslations[locale]
 
   return (
     <section aria-label="Profile hero" className="relative w-full" style={{ minHeight: 380 }}>
@@ -91,7 +97,7 @@ export function ProfileHeroSection({ profile }: ProfileHeroSectionProps) {
             ))}
           </div>
           <span className="font-montserrat text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
-            Bộ sưu tập icon của tôi
+            {t.iconCollection}
           </span>
         </div>
       </div>

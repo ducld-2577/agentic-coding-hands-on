@@ -1,7 +1,16 @@
+'use client'
+
 import Image from 'next/image'
 import Link from 'next/link'
+import { useLocale } from '@/lib/i18n/use-locale'
+import { homeTranslations } from '@/lib/i18n/home-translations'
+import { homeContentTranslations } from '@/lib/i18n/home-content-translations'
 
 export function HomeKudosSection() {
+  const locale = useLocale()
+  const t = homeTranslations[locale]
+  const tc = homeContentTranslations[locale]
+
   return (
     <section
       aria-label="Sun* Kudos"
@@ -11,7 +20,7 @@ export function HomeKudosSection() {
       <div className="relative max-w-[1152px] mx-auto rounded-2xl overflow-hidden min-h-[500px]">
         {/* Background — dark card with golden curves */}
         <Image
-          src="/kudos/kudos-bg.png"
+          src="/kudos/MM_MEDIA_Kudos Background.png"
           alt=""
           fill
           sizes="(max-width: 1440px) 100vw, 1152px"
@@ -46,15 +55,13 @@ export function HomeKudosSection() {
           <div className="flex flex-col gap-8 max-w-[457px]">
             {/* Label + title + description */}
             <div className="flex flex-col gap-4">
-              {/* D2: "Phong trào ghi nhận" label */}
               <p
                 className="font-montserrat font-bold text-white"
                 style={{ fontSize: '24px', lineHeight: '32px' }}
               >
-                Phong trào ghi nhận
+                {t.kudos.movementLabel}
               </p>
 
-              {/* "Sun* Kudos" title */}
               <h2
                 className="font-montserrat font-bold"
                 style={{
@@ -67,23 +74,16 @@ export function HomeKudosSection() {
                 Sun* Kudos
               </h2>
 
-              {/* Description — matches Figma node content exactly */}
               <div
                 className="font-montserrat font-bold text-white"
                 style={{ fontSize: '16px', lineHeight: '24px', letterSpacing: '0.5px' }}
               >
-                <p className="font-bold">ĐIỂM MỚI CỦA SAA 2025</p>
-                <p className="text-justify mt-1">
-                  Hoạt động ghi nhận và cảm ơn đồng nghiệp - lần đầu tiên được diễn ra dành cho
-                  tất cả Sunner. Hoạt động sẽ được triển khai vào tháng 11/2025, khuyến khích
-                  người Sun* chia sẻ những lời ghi nhận, cảm ơn đồng nghiệp trên hệ thống do BTC
-                  công bố. Đây sẽ là chất liệu để Hội đồng Heads tham khảo trong quá trình lựa
-                  chọn người đạt giải.
-                </p>
+                <p className="font-bold">{t.kudos.newFeatureLabel}</p>
+                <p className="text-justify mt-1">{tc.kudosDescription}</p>
               </div>
             </div>
 
-            {/* Chi tiết button */}
+            {/* Details button */}
             <div>
               <Link
                 href="/sun-kudos"
@@ -99,7 +99,7 @@ export function HomeKudosSection() {
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5C518]',
                 ].join(' ')}
               >
-                Chi tiết
+                {t.details}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"

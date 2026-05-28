@@ -5,6 +5,8 @@ import { ChevronDown } from 'lucide-react'
 import { KudosHashtagDropdown } from './kudos-hashtag-dropdown'
 import { KudosPhongbanDropdown } from './kudos-phongban-dropdown'
 import type { KudosHashtag, Department, FilterState } from '@/lib/kudos/types'
+import { useLocale } from '@/lib/i18n/use-locale'
+import { kudosTranslations } from '@/lib/i18n/kudos-translations'
 
 interface KudosFilterButtonsProps {
   hashtags: KudosHashtag[]
@@ -22,6 +24,8 @@ export function KudosFilterButtons({
   onFiltersChange,
 }: KudosFilterButtonsProps) {
   const [open, setOpen] = useState<OpenPanel>(null)
+  const locale = useLocale()
+  const t = kudosTranslations[locale]
 
   const hashtagActive = filters.hashtag_ids.length > 0
   const phongbanActive = filters.department_id !== null
@@ -52,7 +56,7 @@ export function KudosFilterButtons({
             whiteSpace: 'nowrap',
           }}
         >
-          <span>Hashtag</span>
+          <span>{t.filterHashtag}</span>
           {hashtagActive && (
             <span
               className="flex items-center justify-center rounded-full font-bold"
@@ -100,7 +104,7 @@ export function KudosFilterButtons({
             whiteSpace: 'nowrap',
           }}
         >
-          <span>Phòng ban</span>
+          <span>{t.filterDepartment}</span>
           <ChevronDown size={14} aria-hidden="true" />
         </button>
 
