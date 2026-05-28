@@ -1,4 +1,7 @@
+import type { Metadata } from 'next'
 import { LoginHeader } from '@/components/login/login-header'
+
+export const metadata: Metadata = { title: 'Login' }
 import { LoginInteractive } from '@/components/login/login-interactive'
 import { LoginFooter } from '@/components/login/login-footer'
 import { cookies } from 'next/headers'

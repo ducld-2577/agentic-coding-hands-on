@@ -1,8 +1,11 @@
+import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { HomeHeader } from '@/components/home/home-header'
 import { HomeFooter } from '@/components/home/home-footer'
 import { ProfileHeroSection } from '@/components/profile/profile-hero-section'
+
+export const metadata: Metadata = { title: 'Profile' }
 import { ProfileStatsSection } from '@/components/profile/profile-stats-section'
 import { ProfileKudosFeed } from '@/components/profile/profile-kudos-feed'
 import {

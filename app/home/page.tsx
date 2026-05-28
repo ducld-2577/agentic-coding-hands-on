@@ -1,5 +1,8 @@
+import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+
+export const metadata: Metadata = { title: 'Home' }
 import { HomeHeader } from '@/components/home/home-header'
 import { HomeHeroSection } from '@/components/home/home-hero-section'
 import { HomeRootFurther } from '@/components/home/home-root-further'

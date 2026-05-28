@@ -1,3 +1,7 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = { title: 'Admin' }
+
 export default function AdminPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#00101A]">
